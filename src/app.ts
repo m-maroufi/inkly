@@ -11,7 +11,6 @@ export function createApp() {
   app.use("/api/v1", apiV1Router);
 
   app.use(notFoundMiddlware);
-
   // error middleware
   app.use(errorMiddleware);
   return app;
