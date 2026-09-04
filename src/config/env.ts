@@ -11,7 +11,8 @@ if (!parsedEnv.success) {
   process.exit(1);
 }
 export const env = {
-  port: process.env.PORT,
-  logLevel: process.env.LOG_LEVEL,
-  envNode: process.env.NODE_ENV,
+  port: parsedEnv.data.PORT,
+  logLevel: parsedEnv.data.LOG_LEVEL,
+  envNode: parsedEnv.data.NODE_ENV,
+  databaseUrl: parsedEnv.data.DATABASE_URL,
 };
