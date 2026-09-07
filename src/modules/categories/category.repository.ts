@@ -2,6 +2,7 @@ import { eq } from "drizzle-orm";
 import { db } from "../../db";
 import { categories } from "../../db/schema/categories";
 import { CreateCategoryInput, UpdateCategoryInput } from "./category.types";
+import { handleDatabaseError } from "../../shared/errors/database-error";
 
 export async function findAllCategories() {
   return db.select().from(categories);
@@ -26,16 +27,20 @@ export async function findCategoryBySlug(slug: string) {
 }
 
 export async function createCategory(data: CreateCategoryInput, slug: string) {
-  const result = await db
-    .insert(categories)
-    .values({
-      name: data.name,
-      description: data.description ?? null,
-      slug: slug,
-    })
-    .returning();
+  try {
+    const [category] = await db
+      .insert(categories)
+      .values({
+        name: data.name,
+        description: data.description ?? null,
+        slug,
+      })
+      .returning();
 
-  return result;
+    return category;
+  } catch (error) {
+    handleDatabaseError(error);
+  }
 }
 
 export async function updateCategory(id: string, data: UpdateCategoryInput) {
