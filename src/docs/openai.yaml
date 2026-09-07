@@ -1,0 +1,170 @@
+openapi: 3.0.3
+
+info:
+  title: Inkly API
+  description: REST API for Inkly blogging platform
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:3000/api/v1
+    description: Local development server
+
+tags:
+  - name: Health
+    description: API health checks
+
+  - name: Categories
+    description: Blog category management
+
+paths:
+  /categories:
+    post:
+      tags:
+        - Categories
+
+      summary: Create a new category
+      description: Creates a new blog category.
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  minLength: 2
+                  maxLength: 50
+                  example: شبکه اجتماعی
+
+                description:
+                  type: string
+                  maxLength: 500
+                  example: در این دسته بندی درباره شبکه های اجتماعی مقاله منتشر میشود
+
+      responses:
+        "201":
+          description: Category created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+
+                  data:
+                    $ref: "#/components/schemas/Category"
+
+        "400":
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+              example:
+                success: false
+                error:
+                  statusCode: 400
+                  message: Validation failed
+                  details:
+                    - origin: string
+                      code: too_small
+                      minimum: 2
+                      inclusive: true
+                      path:
+                        - name
+                      message: Category name is required.
+
+        "409":
+          description: Category with this slug already exists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+              example:
+                success: false
+                error:
+                  statusCode: 409
+                  message: Category with this slug already exists.
+
+components:
+  schemas:
+    Category:
+      type: object
+      required:
+        - id
+        - name
+        - slug
+        - created_at
+        - updated_at
+
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 5592ac3e-b03d-4dc2-a82a-29a370c62d94
+
+        name:
+          type: string
+          example: شبکه اجتماعی
+
+        description:
+          type: string
+          nullable: true
+          example: در این دسته بندی درباره شبکه های اجتماعی مقاله منتشر میشود
+
+        slug:
+          type: string
+          example: شبکه-اجتماعی
+
+        created_at:
+          type: string
+          format: date-time
+          example: 2026-09-07T09:40:46.580Z
+
+        updated_at:
+          type: string
+          format: date-time
+          example: 2026-09-07T09:40:46.580Z
+
+    ErrorResponse:
+      type: object
+      required:
+        - success
+        - error
+
+      properties:
+        success:
+          type: boolean
+          example: false
+
+        error:
+          type: object
+          required:
+            - statusCode
+            - message
+
+          properties:
+            statusCode:
+              type: integer
+              example: 409
+
+            message:
+              type: string
+              example: Category with this slug already exists.
+
+            details:
+              type: array
+              description: Validation error details. Present only when validation fails.
+              items:
+                type: object
