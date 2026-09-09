@@ -59,9 +59,13 @@ export async function updateCategory(id: string, data: UpdateCategoryInput) {
 }
 
 export async function deleteCategory(id: string) {
-  const result = await db
-    .delete(categories)
-    .where(eq(categories.id, id))
-    .returning();
-  return result[0];
+  try {
+    const result = await db
+      .delete(categories)
+      .where(eq(categories.id, id))
+      .returning();
+    return result[0];
+  } catch (error) {
+    handleDatabaseError(error);
+  }
 }

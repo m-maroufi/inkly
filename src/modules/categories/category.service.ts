@@ -3,6 +3,7 @@ import { NotFoundError } from "../../shared/errors/not-found-error";
 import { generateSlug } from "../../shared/utils/slug";
 import {
   createCategory,
+  deleteCategory,
   findAllCategories,
   findCategoryById,
   findCategoryBySlug,
@@ -51,5 +52,13 @@ export async function updateCategoryService(
     throw new NotFoundError("Category not found");
   }
   const category = await updateCategory(id, data);
+  return category;
+}
+
+export async function deleteCategoryService(id: string) {
+  const category = deleteCategory(id);
+  if (!category) {
+    throw new NotFoundError("Category not found");
+  }
   return category;
 }

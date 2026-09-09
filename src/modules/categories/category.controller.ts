@@ -7,6 +7,7 @@ import {
 } from "./category.schema";
 import {
   createCategoryService,
+  deleteCategoryService,
   getAllCategories,
   getCategoryById,
   getCategoryBySlug,
@@ -94,6 +95,24 @@ export async function updateCategoryController(
     const { id } = categoryIdParamSchema.parse(req.params);
     const data = updateCategorySchema.parse(req.body);
     const category = await updateCategoryService(id, data);
+
+    res.status(200).json({
+      success: true,
+      data: category,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function deleteCategoryController(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const { id } = categoryIdParamSchema.parse(req.params);
+    const category = await deleteCategoryService(id);
 
     res.status(200).json({
       success: true,

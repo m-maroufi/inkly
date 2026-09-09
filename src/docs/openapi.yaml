@@ -270,6 +270,75 @@ paths:
                   statusCode: 404
                   message: Category not found
 
+    delete:
+      tags:
+        - Categories
+      summary: Delete category
+      description: >
+        Deletes an existing blog category. A category cannot be deleted
+        if it is still being used by one or more posts.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Category UUID
+          schema:
+            type: string
+            format: uuid
+          example: 5592ac3e-b03d-4dc2-a82a-29a370c62d94
+
+      responses:
+        "200":
+          description: Category deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: "#/components/schemas/Category"
+
+        "400":
+          description: Invalid category ID
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                success: false
+                error:
+                  statusCode: 400
+                  message: Validation failed
+
+        "404":
+          description: Category not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                success: false
+                error:
+                  statusCode: 404
+                  message: Category not found
+
+        "409":
+          description: Category cannot be deleted because it is still being used
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                success: false
+                error:
+                  statusCode: 409
+                  message: Resource cannot be deleted because it is still being used.
   /categories/{slug}:
     get:
       tags:
