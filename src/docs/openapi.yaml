@@ -21,10 +21,8 @@ paths:
     post:
       tags:
         - Categories
-
       summary: Create a new category
       description: Creates a new blog category.
-
       requestBody:
         required: true
         content:
@@ -39,7 +37,6 @@ paths:
                   minLength: 2
                   maxLength: 50
                   example: شبکه اجتماعی
-
                 description:
                   type: string
                   maxLength: 500
@@ -59,7 +56,6 @@ paths:
                   success:
                     type: boolean
                     example: true
-
                   data:
                     $ref: "#/components/schemas/Category"
 
@@ -69,7 +65,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-
               example:
                 success: false
                 error:
@@ -90,7 +85,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-
               example:
                 success: false
                 error:
@@ -100,10 +94,8 @@ paths:
     get:
       tags:
         - Categories
-
       summary: Get all categories
       description: Returns a list of all blog categories.
-
       responses:
         "200":
           description: Categories retrieved successfully
@@ -118,7 +110,6 @@ paths:
                   success:
                     type: boolean
                     example: true
-
                   data:
                     type: array
                     items:
@@ -128,10 +119,8 @@ paths:
     get:
       tags:
         - Categories
-
       summary: Get category by ID
       description: Returns a single blog category by its ID.
-
       parameters:
         - name: id
           in: path
@@ -156,7 +145,6 @@ paths:
                   success:
                     type: boolean
                     example: true
-
                   data:
                     $ref: "#/components/schemas/Category"
 
@@ -166,19 +154,11 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-
               example:
                 success: false
                 error:
                   statusCode: 400
                   message: Validation failed
-                  details:
-                    - origin: string
-                      code: invalid_format
-                      format: uuid
-                      path:
-                        - id
-                      message: Invalid UUID
 
         "404":
           description: Category not found
@@ -186,7 +166,104 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+              example:
+                success: false
+                error:
+                  statusCode: 404
+                  message: Category not found
 
+    patch:
+      tags:
+        - Categories
+      summary: Update category
+      description: >
+        Updates an existing blog category. At least one of name or description
+        must be provided. The category slug is not changed when the name is updated.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Category UUID
+          schema:
+            type: string
+            format: uuid
+          example: 5592ac3e-b03d-4dc2-a82a-29a370c62d94
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  minLength: 1
+                  maxLength: 50
+                  example: شبکه و اینترنت
+                description:
+                  type: string
+                  maxLength: 500
+                  example: مقالات مربوط به شبکه، اینترنت و فناوری‌های مرتبط
+
+      responses:
+        "200":
+          description: Category updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: "#/components/schemas/Category"
+
+        "400":
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                invalidName:
+                  summary: Invalid category name
+                  value:
+                    success: false
+                    error:
+                      statusCode: 400
+                      message: Validation failed
+                      details:
+                        - origin: string
+                          code: too_small
+                          minimum: 1
+                          inclusive: true
+                          path:
+                            - name
+                          message: Category name is required.
+
+                emptyBody:
+                  summary: Empty update body
+                  value:
+                    success: false
+                    error:
+                      statusCode: 400
+                      message: Validation failed
+                      details:
+                        - code: custom
+                          path: []
+                          message: At least one field must be provided for update.
+
+        "404":
+          description: Category not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
               example:
                 success: false
                 error:
@@ -197,10 +274,8 @@ paths:
     get:
       tags:
         - Categories
-
       summary: Get category by slug
       description: Returns a single blog category by its slug.
-
       parameters:
         - name: slug
           in: path
@@ -224,7 +299,6 @@ paths:
                   success:
                     type: boolean
                     example: true
-
                   data:
                     $ref: "#/components/schemas/Category"
 
@@ -234,7 +308,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-
               example:
                 success: false
                 error:
@@ -254,12 +327,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-
               example:
                 success: false
                 error:
                   statusCode: 404
                   message: Category not found
+
 components:
   schemas:
     Category:
@@ -270,7 +343,6 @@ components:
         - slug
         - created_at
         - updated_at
-
       properties:
         id:
           type: string
@@ -305,7 +377,6 @@ components:
       required:
         - success
         - error
-
       properties:
         success:
           type: boolean
@@ -316,7 +387,6 @@ components:
           required:
             - statusCode
             - message
-
           properties:
             statusCode:
               type: integer

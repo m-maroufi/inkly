@@ -14,20 +14,24 @@ export const createCategorySchema = z.object({
     .optional(),
 });
 
-export const updateCategorySchema = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(1, "Category name is required")
-    .max(50, "Category name must be at most 50 characters")
-    .optional(),
+export const updateCategorySchema = z
+  .object({
+    name: z
+      .string()
+      .trim()
+      .min(1, "Category name is required")
+      .max(50, "Category name must be at most 50 characters")
+      .optional(),
 
-  description: z
-    .string()
-    .trim()
-    .max(500, "Description must be at most 500 characters")
-    .optional(),
-});
+    description: z
+      .string()
+      .trim()
+      .max(500, "Description must be at most 500 characters")
+      .optional(),
+  })
+  .refine((data) => data.name !== undefined || data.description !== undefined, {
+    message: "At least one field must be provided for update.",
+  });
 
 export const categoryIdParamSchema = z.object({
   id: z.uuid(),

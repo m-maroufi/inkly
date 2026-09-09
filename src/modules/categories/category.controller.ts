@@ -3,12 +3,14 @@ import {
   categoryIdParamSchema,
   categorySlugParamSchema,
   createCategorySchema,
+  updateCategorySchema,
 } from "./category.schema";
 import {
   createCategoryService,
   getAllCategories,
   getCategoryById,
   getCategoryBySlug,
+  updateCategoryService,
 } from "./category.service";
 
 export async function createCategoryController(
@@ -73,6 +75,25 @@ export async function getCategoryBySlugController(
     const { slug } = categorySlugParamSchema.parse(req.params);
 
     const category = await getCategoryBySlug(slug);
+
+    res.status(200).json({
+      success: true,
+      data: category,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function updateCategoryController(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const { id } = categoryIdParamSchema.parse(req.params);
+    const data = updateCategorySchema.parse(req.body);
+    const category = await updateCategoryService(id, data);
 
     res.status(200).json({
       success: true,

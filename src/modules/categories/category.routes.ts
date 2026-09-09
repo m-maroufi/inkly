@@ -4,6 +4,7 @@ import {
   getAllCategoriesController,
   getCategoryByIdController,
   getCategoryBySlugController,
+  updateCategoryController,
 } from "./category.controller";
 
 export const categoryRouter = Router();
@@ -15,3 +16,5 @@ categoryRouter.get("/", getAllCategoriesController);
 categoryRouter.get("/id/:id", getCategoryByIdController);
 
 categoryRouter.get("/:slug", getCategoryBySlugController);
+
+categoryRouter.patch("/id/:id", updateCategoryController);

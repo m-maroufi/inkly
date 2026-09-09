@@ -6,8 +6,9 @@ import {
   findAllCategories,
   findCategoryById,
   findCategoryBySlug,
+  updateCategory,
 } from "./category.repository";
-import { CreateCategoryInput } from "./category.types";
+import { CreateCategoryInput, UpdateCategoryInput } from "./category.types";
 
 export async function getAllCategories() {
   return findAllCategories();
@@ -38,5 +39,17 @@ export async function createCategoryService(data: CreateCategoryInput) {
   }
   const category = await createCategory(data, slug);
 
+  return category;
+}
+
+export async function updateCategoryService(
+  id: string,
+  data: UpdateCategoryInput,
+) {
+  const categoryExist = await findCategoryById(id);
+  if (!categoryExist) {
+    throw new NotFoundError("Category not found");
+  }
+  const category = await updateCategory(id, data);
   return category;
 }
