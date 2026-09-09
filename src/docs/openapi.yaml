@@ -123,75 +123,143 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/Category"
-    /categories/{id}:
-      get:
-        tags:
-          - Categories
 
-        summary: Get category by ID
-        description: Returns a single blog category by its ID.
+  /categories/id/{id}:
+    get:
+      tags:
+        - Categories
 
-        parameters:
-          - name: id
-            in: path
-            required: true
-            description: Category UUID
-            schema:
-              type: string
-              format: uuid
-            example: 5592ac3e-b03d-4dc2-a82a-29a370c62d94
+      summary: Get category by ID
+      description: Returns a single blog category by its ID.
 
-        responses:
-          "200":
-            description: Category retrieved successfully
-            content:
-              application/json:
-                schema:
-                  type: object
-                  required:
-                    - success
-                    - data
-                  properties:
-                    success:
-                      type: boolean
-                      example: true
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Category UUID
+          schema:
+            type: string
+            format: uuid
+          example: 5592ac3e-b03d-4dc2-a82a-29a370c62d94
 
-                    data:
-                      $ref: "#/components/schemas/Category"
+      responses:
+        "200":
+          description: Category retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                properties:
+                  success:
+                    type: boolean
+                    example: true
 
-          "400":
-            description: Invalid category ID
-            content:
-              application/json:
-                schema:
-                  $ref: "#/components/schemas/ErrorResponse"
+                  data:
+                    $ref: "#/components/schemas/Category"
 
-                example:
-                  success: false
-                  error:
-                    statusCode: 400
-                    message: Validation failed
-                    details:
-                      - origin: string
-                        code: invalid_format
-                        format: uuid
-                        path:
-                          - id
-                        message: Invalid UUID
+        "400":
+          description: Invalid category ID
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
-          "404":
-            description: Category not found
-            content:
-              application/json:
-                schema:
-                  $ref: "#/components/schemas/ErrorResponse"
+              example:
+                success: false
+                error:
+                  statusCode: 400
+                  message: Validation failed
+                  details:
+                    - origin: string
+                      code: invalid_format
+                      format: uuid
+                      path:
+                        - id
+                      message: Invalid UUID
 
-                example:
-                  success: false
-                  error:
-                    statusCode: 404
-                    message: Category not found
+        "404":
+          description: Category not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
+              example:
+                success: false
+                error:
+                  statusCode: 404
+                  message: Category not found
+
+  /categories/{slug}:
+    get:
+      tags:
+        - Categories
+
+      summary: Get category by slug
+      description: Returns a single blog category by its slug.
+
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          description: Category slug
+          schema:
+            type: string
+          example: شبکه-اجتماعی
+
+      responses:
+        "200":
+          description: Category retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+
+                  data:
+                    $ref: "#/components/schemas/Category"
+
+        "400":
+          description: Invalid category slug
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+              example:
+                success: false
+                error:
+                  statusCode: 400
+                  message: Validation failed
+                  details:
+                    - code: too_small
+                      minimum: 1
+                      inclusive: true
+                      path:
+                        - slug
+                      message: Slug is required
+
+        "404":
+          description: Category not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+              example:
+                success: false
+                error:
+                  statusCode: 404
+                  message: Category not found
 components:
   schemas:
     Category:

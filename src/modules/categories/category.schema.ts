@@ -32,3 +32,7 @@ export const updateCategorySchema = z.object({
 export const categoryIdParamSchema = z.object({
   id: z.uuid(),
 });
+
+export const categorySlugParamSchema = z.object({
+  slug: z.string().trim().min(1, "Slug is required"),
+});
