@@ -97,6 +97,33 @@ paths:
                   statusCode: 409
                   message: Category with this slug already exists.
 
+    get:
+      tags:
+        - Categories
+
+      summary: Get all categories
+      description: Returns a list of all blog categories.
+
+      responses:
+        "200":
+          description: Categories retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Category"
+
 components:
   schemas:
     Category:

@@ -24,7 +24,7 @@ export async function getCategoryById(id: string) {
 export async function getCategoryBySlug(slug: string) {
   const category = await findCategoryBySlug(slug);
   if (!category) {
-    throw new NotFoundError("category Not Found");
+    throw new NotFoundError("Category not found");
   }
   return category;
 }
