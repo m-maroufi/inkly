@@ -28,3 +28,7 @@ export const updateCategorySchema = z.object({
     .max(500, "Description must be at most 500 characters")
     .optional(),
 });
+
+export const categoryIdParamSchema = z.object({
+  id: z.uuid(),
+});

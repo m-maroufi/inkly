@@ -7,7 +7,6 @@ import {
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { users } from "./users";
-import { SQL } from "drizzle-orm";
 
 export const follows = pgTable(
   "follows",

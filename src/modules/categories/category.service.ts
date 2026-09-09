@@ -16,7 +16,7 @@ export async function getAllCategories() {
 export async function getCategoryById(id: string) {
   const category = await findCategoryById(id);
   if (!category) {
-    throw new NotFoundError("category Not Found");
+    throw new NotFoundError("Category not found");
   }
   return category;
 }

@@ -1,6 +1,10 @@
 import { NextFunction, Request, Response } from "express";
-import { createCategorySchema } from "./category.schema";
-import { createCategoryService, getAllCategories } from "./category.service";
+import { categoryIdParamSchema, createCategorySchema } from "./category.schema";
+import {
+  createCategoryService,
+  getAllCategories,
+  getCategoryById,
+} from "./category.service";
 
 export async function createCategoryController(
   req: Request,
@@ -31,6 +35,24 @@ export async function getAllCategoriesController(
     res.status(200).json({
       success: true,
       data: categories,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function getCategoryByIdController(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const { id } = categoryIdParamSchema.parse(req.params);
+    const category = await getCategoryById(id);
+
+    res.status(200).json({
+      success: true,
+      data: category,
     });
   } catch (error) {
     next(error);
