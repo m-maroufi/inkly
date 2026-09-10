@@ -1,0 +1,31 @@
+ErrorResponse:
+  type: object
+  required:
+    - success
+    - error
+
+  properties:
+    success:
+      type: boolean
+      example: false
+
+    error:
+      type: object
+      required:
+        - statusCode
+        - message
+
+      properties:
+        statusCode:
+          type: integer
+          example: 409
+
+        message:
+          type: string
+          example: Resource already exists.
+
+        details:
+          type: array
+          description: Validation error details. Present only when validation fails.
+          items:
+            type: object

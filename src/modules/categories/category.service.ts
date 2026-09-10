@@ -56,7 +56,7 @@ export async function updateCategoryService(
 }
 
 export async function deleteCategoryService(id: string) {
-  const category = deleteCategory(id);
+  const category = await deleteCategory(id);
   if (!category) {
     throw new NotFoundError("Category not found");
   }

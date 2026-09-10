@@ -1,0 +1,300 @@
+categories:
+  post:
+    tags:
+      - Categories
+    summary: Create a new category
+    description: Creates a new blog category.
+
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - name
+            properties:
+              name:
+                type: string
+                minLength: 2
+                maxLength: 50
+                example: شبکه اجتماعی
+
+              description:
+                type: string
+                maxLength: 500
+                example: در این دسته بندی درباره شبکه های اجتماعی مقاله منتشر میشود
+
+    responses:
+      "201":
+        description: Category created successfully
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - success
+                - data
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                data:
+                  $ref: "../schemas/category.yaml#/Category"
+
+      "400":
+        description: Validation failed
+        content:
+          application/json:
+            schema:
+              $ref: "../schemas/error.yaml#/ErrorResponse"
+
+      "409":
+        description: Category with this slug already exists
+        content:
+          application/json:
+            schema:
+              $ref: "../schemas/error.yaml#/ErrorResponse"
+
+  get:
+    tags:
+      - Categories
+    summary: Get all categories
+    description: Returns a list of all blog categories.
+
+    responses:
+      "200":
+        description: Categories retrieved successfully
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - success
+                - data
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                data:
+                  type: array
+                  items:
+                    $ref: "../schemas/category.yaml#/Category"
+
+categoryById:
+  get:
+    tags:
+      - Categories
+    summary: Get category by ID
+    description: Returns a single blog category by its ID.
+
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: Category UUID
+        schema:
+          type: string
+          format: uuid
+        example: 5592ac3e-b03d-4dc2-a82a-29a370c62d94
+
+    responses:
+      "200":
+        description: Category retrieved successfully
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - success
+                - data
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                data:
+                  $ref: "../schemas/category.yaml#/Category"
+
+      "400":
+        description: Invalid category ID
+        content:
+          application/json:
+            schema:
+              $ref: "../schemas/error.yaml#/ErrorResponse"
+
+      "404":
+        description: Category not found
+        content:
+          application/json:
+            schema:
+              $ref: "../schemas/error.yaml#/ErrorResponse"
+
+  patch:
+    tags:
+      - Categories
+    summary: Update category
+    description: >
+      Updates an existing blog category. At least one of name or description
+      must be provided. The category slug is not changed when the name is updated.
+
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: Category UUID
+        schema:
+          type: string
+          format: uuid
+        example: 5592ac3e-b03d-4dc2-a82a-29a370c62d94
+
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                minLength: 1
+                maxLength: 50
+                example: شبکه و اینترنت
+
+              description:
+                type: string
+                maxLength: 500
+                example: مقالات مربوط به شبکه، اینترنت و فناوری‌های مرتبط
+
+    responses:
+      "200":
+        description: Category updated successfully
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - success
+                - data
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                data:
+                  $ref: "../schemas/category.yaml#/Category"
+
+      "400":
+        description: Validation failed
+        content:
+          application/json:
+            schema:
+              $ref: "../schemas/error.yaml#/ErrorResponse"
+
+      "404":
+        description: Category not found
+        content:
+          application/json:
+            schema:
+              $ref: "../schemas/error.yaml#/ErrorResponse"
+
+  delete:
+    tags:
+      - Categories
+    summary: Delete category
+    description: >
+      Deletes an existing blog category. A category cannot be deleted
+      if it is still being used by one or more posts.
+
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: Category UUID
+        schema:
+          type: string
+          format: uuid
+        example: 5592ac3e-b03d-4dc2-a82a-29a370c62d94
+
+    responses:
+      "200":
+        description: Category deleted successfully
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - success
+                - data
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                data:
+                  $ref: "../schemas/category.yaml#/Category"
+
+      "400":
+        description: Invalid category ID
+        content:
+          application/json:
+            schema:
+              $ref: "../schemas/error.yaml#/ErrorResponse"
+
+      "404":
+        description: Category not found
+        content:
+          application/json:
+            schema:
+              $ref: "../schemas/error.yaml#/ErrorResponse"
+
+      "409":
+        description: Category cannot be deleted because it is still being used
+        content:
+          application/json:
+            schema:
+              $ref: "../schemas/error.yaml#/ErrorResponse"
+
+categoryBySlug:
+  get:
+    tags:
+      - Categories
+    summary: Get category by slug
+    description: Returns a single blog category by its slug.
+
+    parameters:
+      - name: slug
+        in: path
+        required: true
+        description: Category slug
+        schema:
+          type: string
+        example: شبکه-اجتماعی
+
+    responses:
+      "200":
+        description: Category retrieved successfully
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - success
+                - data
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                data:
+                  $ref: "../schemas/category.yaml#/Category"
+
+      "400":
+        description: Invalid category slug
+        content:
+          application/json:
+            schema:
+              $ref: "../schemas/error.yaml#/ErrorResponse"
+
+      "404":
+        description: Category not found
+        content:
+          application/json:
+            schema:
+              $ref: "../schemas/error.yaml#/ErrorResponse"

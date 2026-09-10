@@ -339,6 +339,7 @@ paths:
                 error:
                   statusCode: 409
                   message: Resource cannot be deleted because it is still being used.
+
   /categories/{slug}:
     get:
       tags:
