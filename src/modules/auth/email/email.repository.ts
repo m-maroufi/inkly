@@ -34,5 +34,9 @@ export async function createUser(
       password_hash: passwordHash,
     })
     .returning();
+
+  if (!user) {
+    throw new Error("Failed to create user.");
+  }
   return user;
 }
