@@ -7,4 +7,5 @@ export const envSchema = z.object({
   LOG_LEVEL: z.enum(["trace", "debug", "info", "warn", "error", "fatal"]),
   NODE_ENV: z.enum(["development", "test", "production"]),
   DATABASE_URL: z.url(),
+  REDIS_URL: z.url(),
 });

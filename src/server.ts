@@ -1,9 +1,14 @@
 import { createApp } from "./app";
 import { env } from "./config/env";
 import { logger } from "./config/logger";
+import { connectRedis } from "./lib/redis.client";
 
-const app = createApp();
+async function startServer() {
+  await connectRedis();
+  const app = createApp();
+  app.listen(env.port, () => {
+    logger.info({ port: env.port }, "Server started");
+  });
+}
 
-app.listen(env.port, () => {
-  logger.info({ port: env.port }, "Server started");
-});
+startServer();

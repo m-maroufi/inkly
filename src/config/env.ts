@@ -15,4 +15,5 @@ export const env = {
   logLevel: parsedEnv.data.LOG_LEVEL,
   envNode: parsedEnv.data.NODE_ENV,
   databaseUrl: parsedEnv.data.DATABASE_URL,
+  redis_url: parsedEnv.data.REDIS_URL,
 };
