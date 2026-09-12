@@ -25,3 +25,7 @@ export const emailRegisterSchema = z.object({
     .regex(/[A-Za-z]/, "Password must contain at least one letter.")
     .regex(/\d/, "Password must contain at least one number."),
 });
+
+export const emailVerifySchema = z.object({
+  token: z.string().trim().min(1, "Verification token is required."),
+});

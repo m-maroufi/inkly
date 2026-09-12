@@ -40,3 +40,29 @@ export async function createUser(
   }
   return user;
 }
+
+export async function findUserById(userId: string) {
+  const result = await db
+    .select()
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
+
+  return result[0];
+}
+
+export async function markEmailAsVerified(userId: string) {
+  const [user] = await db
+    .update(users)
+    .set({
+      email_verified_at: new Date(),
+      updated_at: new Date(),
+    })
+    .where(eq(users.id, userId))
+    .returning();
+
+  if (!user) {
+    throw new Error("Failed to verify email.");
+  }
+  return user;
+}
