@@ -16,6 +16,8 @@ tags:
   - name: Categories
     description: Blog category management
 
+  - name: Auth
+    description: Authentication and account access endpoints.
 paths:
   /categories:
     $ref: "./paths/categories.yaml#/categories"
@@ -25,6 +27,9 @@ paths:
 
   /categories/{slug}:
     $ref: "./paths/categories.yaml#/categoryBySlug"
+
+  /auth/email/register:
+    $ref: "./paths/auth.yaml#/authEmailRegister"
 
 components:
   schemas:

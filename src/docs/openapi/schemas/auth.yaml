@@ -1,0 +1,47 @@
+authEmailRegister:
+  post:
+    tags:
+      - Auth
+    summary: Register with email
+    description: Creates a new user account using email and password.
+    operationId: registerWithEmail
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../schemas/auth.yaml#/EmailRegisterRequest"
+          example:
+            email: test@example.com
+            username: test_user
+            displayName: Test User
+            password: Test1234
+
+    responses:
+      "201":
+        description: User registered successfully.
+        content:
+          application/json:
+            schema:
+              $ref: "../schemas/auth.yaml#/EmailRegisterResponse"
+
+      "400":
+        description: Invalid request body.
+        content:
+          application/json:
+            schema:
+              $ref: "../schemas/error.yaml#/ErrorResponse"
+
+      "409":
+        description: Email or username is already in use.
+        content:
+          application/json:
+            schema:
+              $ref: "../schemas/error.yaml#/ErrorResponse"
+
+      "500":
+        description: Internal server error.
+        content:
+          application/json:
+            schema:
+              $ref: "../schemas/error.yaml#/ErrorResponse"

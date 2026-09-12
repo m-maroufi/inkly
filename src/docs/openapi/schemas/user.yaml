@@ -1,0 +1,73 @@
+PublicUser:
+  type: object
+  required:
+    - id
+    - email
+    - username
+    - display_name
+    - avatar_url
+    - bio
+    - role
+    - email_verified_at
+    - phone_verified_at
+    - created_at
+    - updated_at
+  properties:
+    id:
+      type: string
+      format: uuid
+      example: 94de0fba-ded1-4948-ac8e-763b8616ab20
+
+    email:
+      type: string
+      format: email
+      nullable: true
+      example: test@example.com
+
+    username:
+      type: string
+      example: test_user
+
+    display_name:
+      type: string
+      example: Test User
+
+    avatar_url:
+      type: string
+      nullable: true
+      example: null
+
+    bio:
+      type: string
+      nullable: true
+      example: null
+
+    role:
+      type: string
+      enum:
+        - ADMIN
+        - USER
+        - AUTHOR
+      example: USER
+
+    email_verified_at:
+      type: string
+      format: date-time
+      nullable: true
+      example: null
+
+    phone_verified_at:
+      type: string
+      format: date-time
+      nullable: true
+      example: null
+
+    created_at:
+      type: string
+      format: date-time
+      example: "2026-09-12T13:54:45.726Z"
+
+    updated_at:
+      type: string
+      format: date-time
+      example: "2026-09-12T13:54:45.726Z"
