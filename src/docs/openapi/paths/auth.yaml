@@ -45,3 +45,48 @@ authEmailRegister:
           application/json:
             schema:
               $ref: "../schemas/error.yaml#/ErrorResponse"
+
+authEmailVerify:
+  post:
+    tags:
+      - Auth
+    summary: Verify email address
+    description: Verifies a user's email address using a valid verification token.
+    operationId: verifyEmail
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../schemas/auth.yaml#/EmailVerifyRequest"
+          example:
+            token: "verification-token"
+
+    responses:
+      "200":
+        description: Email verified successfully.
+        content:
+          application/json:
+            schema:
+              $ref: "../schemas/auth.yaml#/EmailVerifyResponse"
+
+      "400":
+        description: Invalid request body.
+        content:
+          application/json:
+            schema:
+              $ref: "../schemas/error.yaml#/ErrorResponse"
+
+      "404":
+        description: Verification token is invalid or expired.
+        content:
+          application/json:
+            schema:
+              $ref: "../schemas/error.yaml#/ErrorResponse"
+
+      "500":
+        description: Internal server error.
+        content:
+          application/json:
+            schema:
+              $ref: "../schemas/error.yaml#/ErrorResponse"

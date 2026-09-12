@@ -45,3 +45,27 @@ authEmailRegister:
           application/json:
             schema:
               $ref: "../schemas/error.yaml#/ErrorResponse"
+
+EmailVerifyRequest:
+  type: object
+  required:
+    - token
+  properties:
+    token:
+      type: string
+      minLength: 1
+      description: Email verification token.
+      example: verification-token
+
+EmailVerifyResponse:
+  type: object
+  required:
+    - success
+    - data
+  properties:
+    success:
+      type: boolean
+      example: true
+
+    data:
+      $ref: "./user.yaml#/PublicUser"

@@ -31,6 +31,8 @@ paths:
   /auth/email/register:
     $ref: "./paths/auth.yaml#/authEmailRegister"
 
+  /auth/email/verify:
+    $ref: "./paths/auth.yaml#/authEmailVerify"
 components:
   schemas:
     Category:
