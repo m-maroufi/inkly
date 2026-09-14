@@ -24,3 +24,4 @@ export const users = pgTable("users", {
   email_verified_at: timestamp(),
   phone_verified_at: timestamp(),
 });
+export type UserRole = (typeof userRoleEnum.enumValues)[number];
