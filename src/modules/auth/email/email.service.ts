@@ -1,13 +1,16 @@
 import { randomBytes } from "node:crypto";
 import { ConflictError } from "../../../shared/errors/conflict-error";
-import { hashPassword } from "../../../shared/security/password";
+import {
+  hashPassword,
+  verifyPassword,
+} from "../../../shared/security/password";
 import {
   createUser,
   findUserByEmail,
   findUserByUsername,
   markEmailAsVerified,
 } from "./email.repository";
-import { EmailRegisterInput } from "./email.types";
+import { EmailLoginInput, EmailRegisterInput } from "./email.types";
 import {
   deleteEmailVerificationToken,
   getUserIdByEmailVerificationToken,
@@ -15,6 +18,7 @@ import {
 } from "./email-verification-token.store";
 import { toPublicUser } from "../../../shared/utils/user";
 import { NotFoundError } from "../../../shared/errors/not-found-error";
+import { AuthenticationError } from "../../../shared/errors/authentication-error";
 
 export async function registerWithEmail(input: EmailRegisterInput) {
   const existingEmail = await findUserByEmail(input.email);
@@ -44,5 +48,30 @@ export async function verifyEmail(token: string) {
   const user = await markEmailAsVerified(userId);
 
   await deleteEmailVerificationToken(token);
+  return toPublicUser(user);
+}
+
+// login logic
+
+export async function loginWithEmail(input: EmailLoginInput) {
+  const user = await findUserByEmail(input.email);
+
+  if (!user) {
+    throw new AuthenticationError("Invalid email or password.");
+  }
+
+  if (!user.email_verified_at) {
+    throw new AuthenticationError("Email address is not verified.");
+  }
+
+  const passwordIsValid = await verifyPassword(
+    user.password_hash ?? "",
+    input.password,
+  );
+  if (!passwordIsValid) {
+    throw new AuthenticationError("Invalid email or password.");
+  }
+  // generate jwt token
+
   return toPublicUser(user);
 }
