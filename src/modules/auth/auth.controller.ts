@@ -6,6 +6,10 @@ import {
   findRefreshTokenByHash,
   revokeRefreshToken,
 } from "./token/token.repository";
+import { AuthenticationError } from "../../shared/errors/authentication-error";
+import { findUserById } from "./email/email.repository";
+import { NotFoundError } from "../../shared/errors/not-found-error";
+import { toPublicUser } from "../../shared/utils/user";
 
 export async function refreshTokenController(
   req: Request,
@@ -71,6 +75,28 @@ export async function logoutController(
     });
 
     res.status(204).send();
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function getCurrentUserController(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    if (!req.user) {
+      throw new AuthenticationError("Authentication required.");
+    }
+    const user = await findUserById(req.user.id);
+    if (!user) {
+      throw new NotFoundError("User not found.");
+    }
+    res.status(200).json({
+      success: true,
+      data: toPublicUser(user),
+    });
   } catch (error) {
     next(error);
   }

@@ -1,0 +1,14 @@
+import type { UserRole } from "../../db/schema/users";
+
+declare global {
+  namespace Express {
+    interface Request {
+      user?: {
+        id: string;
+        role: UserRole;
+      };
+    }
+  }
+}
+
+export {};
