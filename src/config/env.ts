@@ -17,4 +17,7 @@ export const env = {
   databaseUrl: parsedEnv.data.DATABASE_URL,
   redisUrl: parsedEnv.data.REDIS_URL,
   jwtAccessSecret: parsedEnv.data.JWT_ACCESS_SECRET,
+  jwtAccessExpiresIn: parsedEnv.data.JWT_ACCESS_EXPIRES_IN,
+  refreshTokenCookieName: parsedEnv.data.REFRESH_TOKEN_COOKIE_NAME,
+  refreshTokenCookieMaxAge: parsedEnv.data.REFRESH_TOKEN_COOKIE_MAX_AGE,
 };

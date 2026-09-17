@@ -19,6 +19,7 @@ import {
 import { toPublicUser } from "../../../shared/utils/user";
 import { NotFoundError } from "../../../shared/errors/not-found-error";
 import { AuthenticationError } from "../../../shared/errors/authentication-error";
+import { createAccessToken, createRefreshToken } from "../token/token.service";
 
 export async function registerWithEmail(input: EmailRegisterInput) {
   const existingEmail = await findUserByEmail(input.email);
@@ -71,7 +72,13 @@ export async function loginWithEmail(input: EmailLoginInput) {
   if (!passwordIsValid) {
     throw new AuthenticationError("Invalid email or password.");
   }
-  // generate jwt token
+  // create authentication tokens
+  const accessToken = await createAccessToken(user.id, user.role);
+  const refreshToken = await createRefreshToken(user.id);
 
-  return toPublicUser(user);
+  return {
+    user: toPublicUser(user),
+    accessToken,
+    refreshToken: refreshToken.token,
+  };
 }

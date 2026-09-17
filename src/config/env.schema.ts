@@ -10,4 +10,6 @@ export const envSchema = z.object({
   REDIS_URL: z.url(),
   JWT_ACCESS_SECRET: z.string().min(32),
   JWT_ACCESS_EXPIRES_IN: z.string().min(1),
+  REFRESH_TOKEN_COOKIE_NAME: z.string().min(1),
+  REFRESH_TOKEN_COOKIE_MAX_AGE: z.coerce.number().int().positive(),
 });
