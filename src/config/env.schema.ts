@@ -12,4 +12,6 @@ export const envSchema = z.object({
   JWT_ACCESS_EXPIRES_IN: z.string().min(1),
   REFRESH_TOKEN_COOKIE_NAME: z.string().min(1),
   REFRESH_TOKEN_COOKIE_MAX_AGE: z.coerce.number().int().positive(),
+  RESEND_API_KEY: z.string().min(1),
+  EMAIL_FROM: z.email(),
 });

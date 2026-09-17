@@ -20,4 +20,6 @@ export const env = {
   jwtAccessExpiresIn: parsedEnv.data.JWT_ACCESS_EXPIRES_IN,
   refreshTokenCookieName: parsedEnv.data.REFRESH_TOKEN_COOKIE_NAME,
   refreshTokenCookieMaxAge: parsedEnv.data.REFRESH_TOKEN_COOKIE_MAX_AGE,
+  resendApiKey: parsedEnv.data.RESEND_API_KEY,
+  emailFrom: parsedEnv.data.EMAIL_FROM,
 };
