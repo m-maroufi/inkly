@@ -11,6 +11,7 @@ if (!parsedEnv.success) {
   process.exit(1);
 }
 export const env = {
+  appUrl: parsedEnv.data.APP_URL,
   port: parsedEnv.data.PORT,
   logLevel: parsedEnv.data.LOG_LEVEL,
   envNode: parsedEnv.data.NODE_ENV,
@@ -22,4 +23,5 @@ export const env = {
   refreshTokenCookieMaxAge: parsedEnv.data.REFRESH_TOKEN_COOKIE_MAX_AGE,
   resendApiKey: parsedEnv.data.RESEND_API_KEY,
   emailFrom: parsedEnv.data.EMAIL_FROM,
+  frontendUrl: parsedEnv.data.FRONTEND_URL,
 };

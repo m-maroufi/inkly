@@ -20,6 +20,9 @@ import { toPublicUser } from "../../../shared/utils/user";
 import { NotFoundError } from "../../../shared/errors/not-found-error";
 import { AuthenticationError } from "../../../shared/errors/authentication-error";
 import { createAccessToken, createRefreshToken } from "../token/token.service";
+import { env } from "../../../config/env";
+import { buildEmailVerificationEmail } from "./email.templates";
+import { sendEmail } from "../../../lib/email/email.service";
 
 export async function registerWithEmail(input: EmailRegisterInput) {
   const existingEmail = await findUserByEmail(input.email);
@@ -37,7 +40,7 @@ export async function registerWithEmail(input: EmailRegisterInput) {
 
   const verificationToken = randomBytes(32).toString("hex");
   await storeEmailVerificationToken(verificationToken, user.id);
-
+  await sendVerificationEmail(user.email!, verificationToken);
   return toPublicUser(user);
 }
 
@@ -81,4 +84,16 @@ export async function loginWithEmail(input: EmailLoginInput) {
     accessToken,
     refreshToken: refreshToken.token,
   };
+}
+
+export async function sendVerificationEmail(email: string, token: string) {
+  const verificationUrl = `${env.appUrl}/api/v1/auth/email/verify?token=${encodeURIComponent(token)}`;
+
+  const emailContent = buildEmailVerificationEmail(verificationUrl);
+
+  return sendEmail({
+    to: email,
+    subject: emailContent.subject,
+    html: emailContent.html,
+  });
 }

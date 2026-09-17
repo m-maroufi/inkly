@@ -74,3 +74,29 @@ export async function loginWithEmailController(
     next(error);
   }
 }
+
+export async function verifyEmailFromLinkController(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const token = req.query.token;
+
+    if (typeof token !== "string" || !token) {
+      res.status(400).json({
+        success: false,
+        error: {
+          message: "Verification token is required.",
+        },
+      });
+      return;
+    }
+
+    await verifyEmail(token);
+
+    res.redirect(`${env.frontendUrl}/email-verified`);
+  } catch (error) {
+    next(error);
+  }
+}

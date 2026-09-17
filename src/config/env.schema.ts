@@ -14,4 +14,6 @@ export const envSchema = z.object({
   REFRESH_TOKEN_COOKIE_MAX_AGE: z.coerce.number().int().positive(),
   RESEND_API_KEY: z.string().min(1),
   EMAIL_FROM: z.email(),
+  APP_URL: z.url(),
+  FRONTEND_URL: z.url(),
 });
