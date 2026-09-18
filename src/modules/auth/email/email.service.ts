@@ -7,10 +7,17 @@ import {
 import {
   createUser,
   findUserByEmail,
+  findUserById,
   findUserByUsername,
   markEmailAsVerified,
+  updateUserPassword,
 } from "./email.repository";
-import { EmailLoginInput, EmailRegisterInput } from "./email.types";
+import {
+  EmailLoginInput,
+  EmailRegisterInput,
+  ForgotPasswordInput,
+  ResetPasswordInput,
+} from "./email.types";
 import {
   deleteEmailVerificationToken,
   getUserIdByEmailVerificationToken,
@@ -21,8 +28,17 @@ import { NotFoundError } from "../../../shared/errors/not-found-error";
 import { AuthenticationError } from "../../../shared/errors/authentication-error";
 import { createAccessToken, createRefreshToken } from "../token/token.service";
 import { env } from "../../../config/env";
-import { buildEmailVerificationEmail } from "./email.templates";
+import {
+  buildEmailVerificationEmail,
+  buildPasswordResetEmail,
+} from "./email.templates";
 import { sendEmail } from "../../../lib/email/email.service";
+import {
+  deletePasswordResetToken,
+  getUserIdByPasswordResetToken,
+  storePasswordResetToken,
+} from "./password-reset-token.store";
+import { revokeAllRefreshTokensForUser } from "../token/token.repository";
 
 export async function registerWithEmail(input: EmailRegisterInput) {
   const existingEmail = await findUserByEmail(input.email);
@@ -90,6 +106,51 @@ export async function sendVerificationEmail(email: string, token: string) {
   const verificationUrl = `${env.appUrl}/api/v1/auth/email/verify?token=${encodeURIComponent(token)}`;
 
   const emailContent = buildEmailVerificationEmail(verificationUrl);
+
+  return sendEmail({
+    to: email,
+    subject: emailContent.subject,
+    html: emailContent.html,
+  });
+}
+
+export async function forgetPassword(input: ForgotPasswordInput) {
+  const user = await findUserByEmail(input.email);
+  if (!user) {
+    return;
+  }
+  const resetToken = randomBytes(32).toString("hex");
+  await storePasswordResetToken(resetToken, user.id);
+
+  await sendPasswordResetEmail(user.email!, resetToken);
+}
+
+export async function resetPassword(input: ResetPasswordInput) {
+  const userId = await getUserIdByPasswordResetToken(input.token);
+
+  if (!userId) {
+    throw new NotFoundError("Invalid or expired password reset token.");
+  }
+
+  const user = await findUserById(userId);
+
+  if (!user) {
+    throw new NotFoundError("User not found.");
+  }
+
+  const passwordHash = await hashPassword(input.password);
+
+  await updateUserPassword(user.id, passwordHash);
+
+  await revokeAllRefreshTokensForUser(user.id);
+
+  await deletePasswordResetToken(input.token);
+}
+
+export async function sendPasswordResetEmail(email: string, token: string) {
+  const resetUrl = `${env.frontendUrl}/reset-password?token=${encodeURIComponent(token)}`;
+
+  const emailContent = buildPasswordResetEmail(resetUrl);
 
   return sendEmail({
     to: email,

@@ -57,3 +57,17 @@ export async function revokeRefreshTokenFamily(familyId: string) {
       ),
     );
 }
+
+export async function revokeAllRefreshTokensForUser(userId: string) {
+  await db
+    .update(refresh_tokens)
+    .set({
+      revoked_at: new Date(),
+    })
+    .where(
+      and(
+        eq(refresh_tokens.user_id, userId),
+        isNull(refresh_tokens.revoked_at),
+      ),
+    );
+}

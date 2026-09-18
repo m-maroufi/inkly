@@ -3,11 +3,15 @@ import {
   emailLoginSchema,
   emailRegisterSchema,
   emailVerifySchema,
+  forgotPasswordSchema,
+  resetPasswordSchema,
 } from "./email.schema";
 import {
   loginWithEmail,
   registerWithEmail,
   verifyEmail,
+  forgetPassword,
+  resetPassword,
 } from "./email.service";
 import { env } from "../../../config/env";
 
@@ -96,6 +100,48 @@ export async function verifyEmailFromLinkController(
     await verifyEmail(token);
 
     res.redirect(`${env.frontendUrl}/email-verified`);
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function forgotPasswordController(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const input = forgotPasswordSchema.parse(req.body);
+
+    await forgetPassword(input);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        message:
+          "If an account exists with this email, a password reset link has been sent.",
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+export async function resetPasswordController(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const input = resetPasswordSchema.parse(req.body);
+
+    await resetPassword(input);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        message: "Password has been reset successfully.",
+      },
+    });
   } catch (error) {
     next(error);
   }

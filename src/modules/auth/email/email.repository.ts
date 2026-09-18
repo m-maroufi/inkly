@@ -66,3 +66,18 @@ export async function markEmailAsVerified(userId: string) {
   }
   return user;
 }
+
+export async function updateUserPassword(
+  userId: string,
+  password_hash: string,
+) {
+  const [user] = await db
+    .update(users)
+    .set({
+      password_hash: password_hash,
+      updated_at: new Date(),
+    })
+    .where(eq(users.id, userId))
+    .returning();
+  return user;
+}
