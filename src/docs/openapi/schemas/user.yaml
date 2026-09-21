@@ -71,3 +71,16 @@ PublicUser:
       type: string
       format: date-time
       example: "2026-09-12T13:54:45.726Z"
+
+PublicUserResponse:
+  type: object
+  required:
+    - success
+    - data
+  properties:
+    success:
+      type: boolean
+      example: true
+
+    data:
+      $ref: "#/PublicUser"

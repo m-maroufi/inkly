@@ -1,50 +1,87 @@
-authEmailRegister:
-  post:
-    tags:
-      - Auth
-    summary: Register with email
-    description: Creates a new user account using email and password.
-    operationId: registerWithEmail
-    requestBody:
-      required: true
-      content:
-        application/json:
-          schema:
-            $ref: "../schemas/auth.yaml#/EmailRegisterRequest"
-          example:
-            email: test@example.com
-            username: test_user
-            displayName: Test User
-            password: Test1234
+EmailRegisterRequest:
+  type: object
+  required:
+    - email
+    - username
+    - displayName
+    - password
+  properties:
+    email:
+      type: string
+      format: email
+      example: user@example.com
 
-    responses:
-      "201":
-        description: User registered successfully.
-        content:
-          application/json:
-            schema:
-              $ref: "../schemas/auth.yaml#/EmailRegisterResponse"
+    username:
+      type: string
+      minLength: 3
+      maxLength: 20
+      pattern: "^[A-Za-z0-9_]+$"
+      example: john_doe
 
-      "400":
-        description: Invalid request body.
-        content:
-          application/json:
-            schema:
-              $ref: "../schemas/error.yaml#/ErrorResponse"
+    displayName:
+      type: string
+      minLength: 2
+      maxLength: 50
+      example: John Doe
 
-      "409":
-        description: Email or username is already in use.
-        content:
-          application/json:
-            schema:
-              $ref: "../schemas/error.yaml#/ErrorResponse"
+    password:
+      type: string
+      format: password
+      minLength: 8
+      example: Password123
 
-      "500":
-        description: Internal server error.
-        content:
-          application/json:
-            schema:
-              $ref: "../schemas/error.yaml#/ErrorResponse"
+EmailRegisterResponse:
+  type: object
+  required:
+    - success
+    - data
+  properties:
+    success:
+      type: boolean
+      example: true
+
+    data:
+      $ref: "./user.yaml#/PublicUser"
+
+EmailLoginRequest:
+  type: object
+  required:
+    - email
+    - password
+  properties:
+    email:
+      type: string
+      format: email
+      example: user@example.com
+
+    password:
+      type: string
+      format: password
+      example: Password123
+
+EmailLoginResponse:
+  type: object
+  required:
+    - success
+    - data
+  properties:
+    success:
+      type: boolean
+      example: true
+
+    data:
+      type: object
+      required:
+        - user
+        - accessToken
+      properties:
+        user:
+          $ref: "./user.yaml#/PublicUser"
+
+        accessToken:
+          type: string
+          description: Short-lived JWT access token.
+          example: eyJhbGciOiJIUzI1NiIs...
 
 EmailVerifyRequest:
   type: object
@@ -69,3 +106,98 @@ EmailVerifyResponse:
 
     data:
       $ref: "./user.yaml#/PublicUser"
+
+ForgotPasswordRequest:
+  type: object
+  required:
+    - email
+  properties:
+    email:
+      type: string
+      format: email
+      example: user@example.com
+
+ForgotPasswordResponse:
+  type: object
+  required:
+    - success
+    - data
+  properties:
+    success:
+      type: boolean
+      example: true
+
+    data:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          example: If an account exists with this email, a password reset link has been sent.
+
+ResetPasswordRequest:
+  type: object
+  required:
+    - token
+    - password
+  properties:
+    token:
+      type: string
+      minLength: 1
+      description: Password reset token.
+      example: reset-token
+
+    password:
+      type: string
+      format: password
+      minLength: 8
+      example: NewPassword123
+
+ResetPasswordResponse:
+  type: object
+  required:
+    - success
+    - data
+  properties:
+    success:
+      type: boolean
+      example: true
+
+    data:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          example: Password has been reset successfully.
+
+RefreshTokenResponse:
+  type: object
+  required:
+    - success
+    - data
+  properties:
+    success:
+      type: boolean
+      example: true
+
+    data:
+      type: object
+      required:
+        - accessToken
+      properties:
+        accessToken:
+          type: string
+          description: Short-lived JWT access token.
+          example: eyJhbGciOiJIUzI1NiIs...
+
+LogoutResponse:
+  type: object
+  required:
+    - success
+  properties:
+    success:
+      type: boolean
+      example: true

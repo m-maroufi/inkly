@@ -18,6 +18,7 @@ tags:
 
   - name: Auth
     description: Authentication and account access endpoints.
+
 paths:
   /categories:
     $ref: "./paths/categories.yaml#/categories"
@@ -28,15 +29,80 @@ paths:
   /categories/{slug}:
     $ref: "./paths/categories.yaml#/categoryBySlug"
 
+  # Auth
   /auth/email/register:
     $ref: "./paths/auth.yaml#/authEmailRegister"
 
+  /auth/email/login:
+    $ref: "./paths/auth.yaml#/authEmailLogin"
+
   /auth/email/verify:
     $ref: "./paths/auth.yaml#/authEmailVerify"
+
+  /auth/email/forgot-password:
+    $ref: "./paths/auth.yaml#/authForgotPassword"
+
+  /auth/email/reset-password:
+    $ref: "./paths/auth.yaml#/authResetPassword"
+
+  /auth/refresh:
+    $ref: "./paths/auth.yaml#/authRefresh"
+
+  /auth/logout:
+    $ref: "./paths/auth.yaml#/authLogout"
+
+  /auth/me:
+    $ref: "./paths/auth.yaml#/authMe"
+
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
   schemas:
     Category:
       $ref: "./schemas/category.yaml#/Category"
 
     ErrorResponse:
       $ref: "./schemas/error.yaml#/ErrorResponse"
+
+    EmailRegisterRequest:
+      $ref: "./schemas/auth.yaml#/EmailRegisterRequest"
+
+    EmailRegisterResponse:
+      $ref: "./schemas/auth.yaml#/EmailRegisterResponse"
+
+    EmailLoginRequest:
+      $ref: "./schemas/auth.yaml#/EmailLoginRequest"
+
+    EmailLoginResponse:
+      $ref: "./schemas/auth.yaml#/EmailLoginResponse"
+
+    EmailVerifyRequest:
+      $ref: "./schemas/auth.yaml#/EmailVerifyRequest"
+
+    EmailVerifyResponse:
+      $ref: "./schemas/auth.yaml#/EmailVerifyResponse"
+
+    ForgotPasswordRequest:
+      $ref: "./schemas/auth.yaml#/ForgotPasswordRequest"
+
+    ForgotPasswordResponse:
+      $ref: "./schemas/auth.yaml#/ForgotPasswordResponse"
+
+    ResetPasswordRequest:
+      $ref: "./schemas/auth.yaml#/ResetPasswordRequest"
+
+    ResetPasswordResponse:
+      $ref: "./schemas/auth.yaml#/ResetPasswordResponse"
+
+    RefreshTokenResponse:
+      $ref: "./schemas/auth.yaml#/RefreshTokenResponse"
+
+    LogoutResponse:
+      $ref: "./schemas/auth.yaml#/LogoutResponse"
+
+    PublicUser:
+      $ref: "./schemas/user.yaml#/PublicUser"
