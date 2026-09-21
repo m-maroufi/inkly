@@ -7,17 +7,30 @@ import {
   updateCategoryController,
   deleteCategoryController,
 } from "./category.controller";
+import { authMiddleware } from "../../middlewares/auth.middleware";
+import { requireRole } from "../../middlewares/authorization.middleware";
 
 export const categoryRouter = Router();
-
-categoryRouter.post("/", createCategoryController);
-
+//public
 categoryRouter.get("/", getAllCategoriesController);
-
 categoryRouter.get("/id/:id", getCategoryByIdController);
-
 categoryRouter.get("/:slug", getCategoryBySlugController);
-
-categoryRouter.patch("/id/:id", updateCategoryController);
-
-categoryRouter.delete("/id/:id", deleteCategoryController);
+// only admin
+categoryRouter.post(
+  "/",
+  authMiddleware,
+  requireRole("ADMIN"),
+  createCategoryController,
+);
+categoryRouter.patch(
+  "/id/:id",
+  authMiddleware,
+  requireRole("ADMIN"),
+  updateCategoryController,
+);
+categoryRouter.delete(
+  "/id/:id",
+  authMiddleware,
+  requireRole("ADMIN"),
+  deleteCategoryController,
+);
