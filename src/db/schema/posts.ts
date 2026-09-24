@@ -46,6 +46,8 @@ export const posts = pgTable(
     published_at: timestamp(),
     created_at: timestamp().notNull().defaultNow(),
     updated_at: timestamp().notNull().defaultNow(),
+
+    rejection_reason: text(),
   },
   (table) => [
     index("posts_author_id_idx").on(table.author_id),
