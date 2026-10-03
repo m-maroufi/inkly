@@ -17,6 +17,21 @@ export const postStatus = pgEnum("post_status", [
   "REJECTED",
 ]);
 
+// Posts table
+// Stores blog articles created by authors, including the review/publishing workflow.
+// Relationships:
+// - belongs to users through author_id (ON DELETE CASCADE)
+// - belongs to categories through category_id (ON DELETE RESTRICT)
+// - connected to tags through post_tags (many-to-many)
+// - has comments, likes, bookmarks and views
+// - referenced by notifications and reports
+//
+// Design notes:
+// - supports draft and publishing workflow via the post_status enum.
+// - slug is unique for SEO-friendly URLs.
+// - cover images use a Cloudinary-style url + public_id pair.
+// - rejection_reason records why a post was rejected during review.
+
 export const posts = pgTable(
   "posts",
   {

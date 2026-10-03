@@ -43,6 +43,7 @@
     "typescript": "^7.0.2"
   },
   "allowScripts": {
-    "esbuild@0.28.2": true
+    "argon2@0.45.1": true,
+    "esbuild@0.25.12": true
   }
 }

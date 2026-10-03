@@ -13,4 +13,4 @@ export type UpdatePostInput = z.infer<typeof updatePostSchema>;
 export type RejectPostInput = z.infer<typeof rejectPostSchema>;
 
 export type Post = typeof posts.$inferSelect;
-export type newPost = typeof posts.$inferInsert;
+export type NewPost = typeof posts.$inferInsert;

@@ -9,6 +9,18 @@ import {
 import { users } from "./users";
 import { posts } from "./posts";
 
+// Comments table
+// Stores comments on posts, including threaded replies via a self-reference.
+// Relationships:
+// - belongs to users through user_id (ON DELETE CASCADE)
+// - belongs to posts through post_id (ON DELETE CASCADE)
+// - self-references comments through parent_id for replies (ON DELETE CASCADE)
+// - referenced by notifications and reports
+//
+// Design notes:
+// - parent_id is null for top-level comments.
+// - dedicated indexes exist for post, user and parent lookups.
+
 export const comments = pgTable(
   "comments",
   {

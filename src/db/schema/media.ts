@@ -16,6 +16,16 @@ export const mediaType = pgEnum("media_type", [
   "DOCUMENT",
 ]);
 
+// Media table
+// Stores metadata for uploaded assets (images, video, audio, documents).
+// Relationships:
+// - uploaded_by -> users (ON DELETE CASCADE)
+//
+// Design notes:
+// - media_type is constrained by the media_type enum.
+// - storage_key (internal) is separated from url (public) for object-storage readiness.
+// - there is no foreign key linking media rows directly to posts.
+
 export const media = pgTable(
   "media",
   {

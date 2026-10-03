@@ -22,6 +22,20 @@ export const reportStatusType = pgEnum("report_status_type", [
   "ACTION_TAKEN",
 ]);
 
+// Reports table
+// Stores moderation reports against a post, a comment, or a user.
+// Relationships:
+// - reporter_id -> users (ON DELETE SET NULL)
+// - post_id -> posts (ON DELETE SET NULL)
+// - comment_id -> comments (ON DELETE SET NULL)
+// - reported_user_id -> users (ON DELETE SET NULL)
+//
+// Design notes:
+// - reason and status are constrained by the reason_type and report_status_type enums.
+// - reports_exactly_one_target check requires exactly one of post_id, comment_id or
+//   reported_user_id to be non-null.
+// - no indexes on target/status columns, so moderation listing queries may scan.
+
 export const reports = pgTable(
   "reports",
   {

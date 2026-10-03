@@ -1,6 +1,16 @@
 import { index, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { users } from "./users";
 
+// Refresh tokens table
+// Persists hashed refresh tokens for JWT session rotation and revocation.
+// Relationships:
+// - user_id -> users (ON DELETE CASCADE)
+//
+// Design notes:
+// - only token_hash is stored, never the raw token.
+// - family_id groups tokens in a rotation chain for reuse detection.
+// - revoked_at is null while a token is active; expires_at bounds its validity.
+
 export const refresh_tokens = pgTable(
   "refresh_tokens",
   {
