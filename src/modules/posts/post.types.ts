@@ -7,7 +7,10 @@ import {
 import { posts } from "../../db/schema/posts";
 
 export type CreatePostInput = z.infer<typeof createPostSchema>;
-
+export type CreatePostRepositoryInput = CreatePostInput & {
+  coverImageUrl?: string;
+  coverImagePublicId?: string;
+};
 export type UpdatePostInput = z.infer<typeof updatePostSchema>;
 
 export type RejectPostInput = z.infer<typeof rejectPostSchema>;

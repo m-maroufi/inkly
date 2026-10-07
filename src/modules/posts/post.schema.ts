@@ -28,10 +28,6 @@ export const createPostSchema = z.object({
     .max(500)
     .optional(),
 
-  coverImageUrl: z.url("Invalid cover image URL.").optional(),
-
-  coverImagePublicId: z.string().trim().min(1).optional(),
-
   coverImageAlt: z
     .string()
     .trim()

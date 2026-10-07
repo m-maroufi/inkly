@@ -1,7 +1,7 @@
 import { desc, eq, sql } from "drizzle-orm";
 import { db } from "../../db";
 import { posts } from "../../db/schema/posts";
-import { CreatePostInput, UpdatePostInput } from "./post.types";
+import { CreatePostRepositoryInput, UpdatePostInput } from "./post.types";
 import { handleDatabaseError } from "../../shared/errors/database-error";
 import { users } from "../../db/schema/users";
 import { categories } from "../../db/schema/categories";
@@ -40,7 +40,7 @@ export async function findPostsByAuthor(authorId: string) {
 }
 
 export async function createPost(
-  data: CreatePostInput,
+  data: CreatePostRepositoryInput,
   authorId: string,
   slug: string,
 ) {
@@ -137,6 +137,7 @@ export async function existsPostBySlug(slug: string) {
 
   return Boolean(post);
 }
+
 export async function findPostDetailsBySlug(slug: string) {
   const result = await db
     .select({

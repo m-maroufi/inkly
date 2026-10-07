@@ -24,4 +24,7 @@ export const env = {
   resendApiKey: parsedEnv.data.RESEND_API_KEY,
   emailFrom: parsedEnv.data.EMAIL_FROM,
   frontendUrl: parsedEnv.data.FRONTEND_URL,
+  cloudinaryCloudName: parsedEnv.data.CLOUDINARY_CLOUD_NAME,
+  cloudinaryApiKey: parsedEnv.data.CLOUDINARY_API_KEY,
+  cloudinaryApiSecret: parsedEnv.data.CLOUDINARY_API_SECRET,
 };
