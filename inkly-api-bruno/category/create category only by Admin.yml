@@ -1,0 +1,25 @@
+info:
+  name: create category only by Admin
+  type: http
+  seq: 4
+
+http:
+  method: POST
+  url: "{{base_url}}/categories"
+  body:
+    type: json
+    data: |-
+      {
+        "name": "برنامه نویسی وب",
+        "description": "در این دسته بندی مقالات و نوشته های در مورد برنامه نویسی وب نوشته میشود."
+      }
+  auth:
+    type: bearer
+    token: "{{accessToken}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

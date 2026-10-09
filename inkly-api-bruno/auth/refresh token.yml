@@ -1,0 +1,29 @@
+info:
+  name: refresh token
+  type: http
+  seq: 8
+
+http:
+  method: POST
+  url: "{{base_url}}/auth/refresh"
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        const body = res.getBody();
+
+        if (body.success && body.data?.accessToken) {
+          bru.setEnvVar("accessToken", body.data.accessToken);
+          console.log("Access token saved to environment:", bru.getEnvName());
+        } else {
+          console.error("Login failed or accessToken is missing");
+        }
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

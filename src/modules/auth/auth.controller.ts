@@ -59,6 +59,7 @@ export async function logoutController(
 
     if (!refreshToken) {
       res.status(204).send();
+      return;
     }
 
     const tokenHash = createHash("sha256").update(refreshToken).digest("hex");
