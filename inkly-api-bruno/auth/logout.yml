@@ -6,7 +6,9 @@ info:
 http:
   method: POST
   url: "{{base_url}}/auth/logout"
-  auth: inherit
+  auth:
+    type: bearer
+    token: "{{accessToken}}"
 
 settings:
   encodeUrl: true

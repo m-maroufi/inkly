@@ -27,3 +27,6 @@ export async function deleteRedisValue(key: string) {
 export async function hasRedisKey(key: string) {
   return (await redisClient.exists(key)) === 1;
 }
+export async function incrementRedisValue(key: string) {
+  return redisClient.incr(key);
+}

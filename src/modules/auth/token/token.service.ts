@@ -11,6 +11,12 @@ import {
 import { AuthenticationError } from "../../../shared/errors/authentication-error";
 import { rotateRefreshTokenTransaction } from "./token.transaction.repository";
 import { addDays } from "../../../shared/utils/date";
+import {
+  getRedisValue,
+  hasRedisKey,
+  incrementRedisValue,
+  setRedisValue,
+} from "../../../lib/redis/redis.store";
 
 const secret = new TextEncoder().encode(env.jwtAccessSecret);
 
@@ -18,7 +24,12 @@ function hashRefreshToken(token: string) {
   return createHash("sha256").update(token).digest("hex");
 }
 export async function createAccessToken(userId: string, role: UserRole) {
-  return new SignJWT({ role })
+  const tokenVersion = await getUserTokenVersion(userId);
+
+  return new SignJWT({
+    role,
+    ver: tokenVersion,
+  })
     .setProtectedHeader({ alg: "HS256" })
     .setSubject(userId)
     .setIssuedAt()
@@ -104,4 +115,73 @@ export async function rotateRefreshToken(token: string) {
     familyId: tokenRecord.family_id,
     expiresAt,
   };
+}
+
+const REVOKED_ACCESS_TOKEN_PREFIX = "auth:revoked-access:";
+
+function hashAccessToken(token: string) {
+  return createHash("sha256").update(token).digest("hex");
+}
+
+export async function revokeAccessToken(token: string): Promise<void> {
+  const { payload } = await jwtVerify(token, secret, {
+    algorithms: ["HS256"],
+  });
+
+  // مطمئن می‌شویم payload متعلق به Access Token معتبر Inkly است.
+  accessTokenPayloadSchema.parse(payload);
+
+  if (typeof payload.exp !== "number") {
+    throw new AuthenticationError("Invalid access token expiration.");
+  }
+
+  const nowInSeconds = Math.floor(Date.now() / 1000);
+  const ttlInSeconds = payload.exp - nowInSeconds;
+
+  if (ttlInSeconds <= 0) {
+    throw new AuthenticationError("Access token has expired.");
+  }
+
+  const key = `${REVOKED_ACCESS_TOKEN_PREFIX}${hashAccessToken(token)}`;
+
+  await setRedisValue(key, "1", ttlInSeconds);
+}
+
+export async function isAccessTokenRevoked(token: string): Promise<boolean> {
+  const key = `${REVOKED_ACCESS_TOKEN_PREFIX}${hashAccessToken(token)}`;
+
+  return hasRedisKey(key);
+}
+
+const USER_TOKEN_VERSION_PREFIX = "auth:user-token-version:";
+
+async function getUserTokenVersion(userId: string): Promise<number> {
+  const value = await getRedisValue(`${USER_TOKEN_VERSION_PREFIX}${userId}`);
+
+  if (value === null) {
+    return 0;
+  }
+
+  const version = Number(value);
+
+  if (!Number.isSafeInteger(version) || version < 0) {
+    throw new Error("Invalid user token version in Redis.");
+  }
+
+  return version;
+}
+
+export async function incrementUserTokenVersion(
+  userId: string,
+): Promise<number> {
+  return incrementRedisValue(`${USER_TOKEN_VERSION_PREFIX}${userId}`);
+}
+
+export async function isAccessTokenVersionCurrent(
+  userId: string,
+  tokenVersion: number,
+): Promise<boolean> {
+  const currentVersion = await getUserTokenVersion(userId);
+
+  return currentVersion === tokenVersion;
 }

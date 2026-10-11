@@ -10,6 +10,7 @@ import { AuthenticationError } from "../../shared/errors/authentication-error";
 import { findUserById } from "./email/email.repository";
 import { NotFoundError } from "../../shared/errors/not-found-error";
 import { toPublicUser } from "../../shared/utils/user";
+import { revokeAccessToken } from "./token/token.service";
 
 export async function refreshTokenController(
   req: Request,
@@ -49,6 +50,7 @@ export async function refreshTokenController(
     next(error);
   }
 }
+
 export async function logoutController(
   req: Request,
   res: Response,
@@ -56,18 +58,31 @@ export async function logoutController(
 ) {
   try {
     const refreshToken = req.cookies[env.refreshTokenCookieName];
+    const authorization = req.headers.authorization;
 
-    if (!refreshToken) {
-      res.status(204).send();
-      return;
+    // 1. Revoke the refresh token, if present.
+    if (refreshToken) {
+      const tokenHash = createHash("sha256").update(refreshToken).digest("hex");
+
+      const tokenRecord = await findRefreshTokenByHash(tokenHash);
+
+      if (tokenRecord && !tokenRecord.revoked_at) {
+        await revokeRefreshToken(tokenRecord.id);
+      }
     }
 
-    const tokenHash = createHash("sha256").update(refreshToken).digest("hex");
-    const tokenRecord = await findRefreshTokenByHash(tokenHash);
+    // 2. Revoke the access token, if supplied.
+    if (authorization) {
+      const [scheme, token, ...extraParts] = authorization.split(" ");
 
-    if (tokenRecord && !tokenRecord.revoked_at) {
-      await revokeRefreshToken(tokenRecord.id);
+      if (scheme !== "Bearer" || !token || extraParts.length > 0) {
+        throw new AuthenticationError("Invalid authorization header.");
+      }
+
+      await revokeAccessToken(token);
     }
+
+    // 3. Clear the refresh-token cookie.
     res.clearCookie(env.refreshTokenCookieName, {
       httpOnly: true,
       secure: env.envNode === "production",

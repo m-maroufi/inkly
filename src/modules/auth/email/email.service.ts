@@ -26,7 +26,11 @@ import {
 import { toPublicUser } from "../../../shared/utils/user";
 import { NotFoundError } from "../../../shared/errors/not-found-error";
 import { AuthenticationError } from "../../../shared/errors/authentication-error";
-import { createAccessToken, createRefreshToken } from "../token/token.service";
+import {
+  createAccessToken,
+  createRefreshToken,
+  incrementUserTokenVersion,
+} from "../token/token.service";
 import { env } from "../../../config/env";
 import {
   buildEmailVerificationEmail,
@@ -142,7 +146,9 @@ export async function resetPassword(input: ResetPasswordInput) {
 
   await updateUserPassword(user.id, passwordHash);
 
+  // Password has been updated successfully.
   await revokeAllRefreshTokensForUser(user.id);
+  await incrementUserTokenVersion(user.id);
 
   await deletePasswordResetToken(input.token);
 }

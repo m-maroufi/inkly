@@ -4,6 +4,7 @@ import { userRoleEnum } from "../../../db/schema/users";
 export const accessTokenPayloadSchema = z.object({
   sub: z.uuid(),
   role: z.enum(userRoleEnum.enumValues),
+  ver: z.number().int().nonnegative().default(0),
 });
 
 export type AccessTokenPayload = z.infer<typeof accessTokenPayloadSchema>;
