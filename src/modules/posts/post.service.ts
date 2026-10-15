@@ -10,6 +10,7 @@ import {
   createPost,
   existsPostBySlug,
   findPostDetailsBySlug,
+  findPostsByAuthor,
   findPublishedPosts,
 } from "./post.repository";
 import { CreatePostInput } from "./post.types";
@@ -74,4 +75,8 @@ export async function getPublishedPostDetailsService(slug: string) {
   }
 
   return post;
+}
+
+export async function getAuthorPostsService(authorId: string) {
+  return findPostsByAuthor(authorId);
 }

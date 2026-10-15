@@ -1,6 +1,7 @@
 import { NextFunction, Response, Request } from "express";
 import {
   createPostService,
+  getAuthorPostsService,
   getPublishedPostDetailsService,
   getPublishedPostsService,
 } from "./post.service";
@@ -65,6 +66,27 @@ export async function getPublishedPostDetailsController(
     res.status(200).json({
       success: true,
       data: post,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function getAuthorPostsController(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    if (!req.user) {
+      throw new AuthenticationError("Authentication required.");
+    }
+    const authorId = req.user.id;
+    const posts = await getAuthorPostsService(authorId);
+
+    res.status(200).json({
+      success: true,
+      data: posts,
     });
   } catch (error) {
     next(error);
