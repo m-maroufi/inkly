@@ -9,6 +9,7 @@ import { findCategoryById } from "../categories/category.repository";
 import {
   createPost,
   existsPostBySlug,
+  findPostById,
   findPostDetailsBySlug,
   findPostsByAuthor,
   findPublishedPosts,
@@ -79,4 +80,18 @@ export async function getPublishedPostDetailsService(slug: string) {
 
 export async function getAuthorPostsService(authorId: string) {
   return findPostsByAuthor(authorId);
+}
+
+export async function getAuthorPostByIdService(
+  authorId: string,
+  postId: string,
+) {
+  const post = await findPostById(postId);
+  if (!post) {
+    throw new NotFoundError("Post not found.");
+  }
+  if (post.author_id !== authorId) {
+    throw new NotFoundError("Post not found.");
+  }
+  return post;
 }

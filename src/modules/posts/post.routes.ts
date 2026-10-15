@@ -7,6 +7,7 @@ import {
   getPublishedPostsController,
   getPublishedPostDetailsController,
   getAuthorPostsController,
+  getAuthorPostByIdController,
 } from "./post.controller";
 
 export const postRouter = Router();
@@ -17,6 +18,12 @@ postRouter.get(
   authMiddleware,
   requireRole("AUTHOR", "ADMIN"),
   getAuthorPostsController,
+);
+postRouter.get(
+  "/me/:postId",
+  authMiddleware,
+  requireRole("AUTHOR", "ADMIN"),
+  getAuthorPostByIdController,
 );
 postRouter.get("/:slug", getPublishedPostDetailsController);
 postRouter.post(

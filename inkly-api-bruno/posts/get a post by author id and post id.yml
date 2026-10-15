@@ -1,0 +1,72 @@
+info:
+  name: get a post by author id and post id
+  type: http
+  seq: 5
+
+http:
+  method: GET
+  url: "{{base_url}}/posts/me/{{postId}}"
+  auth:
+    type: bearer
+    token: "{{accessToken}}"
+
+runtime:
+  variables:
+    - name: postId
+      value: 4e279a24-757b-4720-85fa-a54afcf75eeb
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+docs: |-
+  ## دریافت جزئیات یک پست از نویسنده
+
+  پست مشخصی از پست‌های **خود نویسنده لاگین‌شده** رو با ID برمیگردونه.
+
+  ### نکات مهم
+  - پست با **هر وضعیتی** (Draft، Pending، Published، Rejected) برگردونده میشه
+  - اگه پست با این ID وجود نداشته باشه یا **متعلق به این نویسنده نباشه** → `404 Not Found`
+  - دسترسی نیاز به نقش `AUTHOR` یا `ADMIN` داره
+
+  ### احراز هویت
+  نیاز به **Bearer Token** در هدر `Authorization` داره.
+
+  ### پارامترهای URL
+  | پارامتر | نوع | توضیح |
+  |---------|-----|-------|
+  | `postId` | `UUID` | شناسه یکتای پست |
+
+  ### نمونه درخواست
+  ```http
+  GET /api/v1/posts/me/550e8400-e29b-41d4-a716-446655440000
+  Authorization: Bearer <access_token>
+  ```
+
+  ### نمونه پاسخ موفق (`200 OK`)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "550e8400-e29b-41d4-a716-446655440000",
+      "title": "عنوان پست",
+      "slug": "nwsht-mn",
+      "status": "DRAFT",
+      "author_id": "...",
+      "category_id": "...",
+      "content": "...",
+      "created_at": "2026-09-01T10:00:00.000Z",
+      "updated_at": "2026-09-01T10:00:00.000Z"
+    }
+  }
+  ```
+
+  ### خطاهای احتمالی
+  | کد | توضیح |
+  |----|-------|
+  | `401` | توکن ارسال نشده یا منقضی شده |
+  | `403` | کاربر نقش `AUTHOR` یا `ADMIN` نداره |
+  | `404` | پست پیدا نشد یا متعلق به این نویسنده نیست |
