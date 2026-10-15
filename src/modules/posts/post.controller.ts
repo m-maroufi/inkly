@@ -1,7 +1,12 @@
 import { NextFunction, Response, Request } from "express";
-import { createPostService } from "./post.service";
+import {
+  createPostService,
+  getPublishedPostDetailsService,
+  getPublishedPostsService,
+} from "./post.service";
 import { createPostSchema } from "./post.schema";
 import { AuthenticationError } from "../../shared/errors/authentication-error";
+import { NotFoundError } from "../../shared/errors/not-found-error";
 
 export async function createPostController(
   req: Request,
@@ -19,6 +24,45 @@ export async function createPostController(
     const post = await createPostService(data, authorId, imageBuffer);
 
     res.status(201).json({
+      success: true,
+      data: post,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function getPublishedPostsController(
+  _req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const posts = await getPublishedPostsService();
+
+    res.status(200).json({
+      success: true,
+      data: posts,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+export async function getPublishedPostDetailsController(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const slug = req.params.slug;
+
+    if (typeof slug !== "string" || !slug.trim()) {
+      throw new NotFoundError("Post not found.");
+    }
+
+    const post = await getPublishedPostDetailsService(slug);
+
+    res.status(200).json({
       success: true,
       data: post,
     });

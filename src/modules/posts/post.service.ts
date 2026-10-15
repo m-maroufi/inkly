@@ -6,7 +6,12 @@ import { ConflictError } from "../../shared/errors/conflict-error";
 import { NotFoundError } from "../../shared/errors/not-found-error";
 import { generateSlug } from "../../shared/utils/slug";
 import { findCategoryById } from "../categories/category.repository";
-import { createPost, existsPostBySlug } from "./post.repository";
+import {
+  createPost,
+  existsPostBySlug,
+  findPostDetailsBySlug,
+  findPublishedPosts,
+} from "./post.repository";
 import { CreatePostInput } from "./post.types";
 
 export async function createPostService(
@@ -55,4 +60,18 @@ export async function createPostService(
 
     throw error;
   }
+}
+
+export async function getPublishedPostsService() {
+  return findPublishedPosts();
+}
+
+export async function getPublishedPostDetailsService(slug: string) {
+  const post = await findPostDetailsBySlug(slug);
+
+  if (!post) {
+    throw new NotFoundError("Post not found.");
+  }
+
+  return post;
 }

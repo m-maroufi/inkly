@@ -10,10 +10,20 @@ import { comments } from "../../db/schema/comments";
 import { post_views } from "../../db/schema/post_views";
 import { tags } from "../../db/schema/tags";
 import { post_tags } from "../../db/schema/post_tags";
+import { and } from "drizzle-orm";
 
 export async function findAllPosts() {
   const result = await db.select().from(posts).orderBy(desc(posts.created_at));
   return result;
+}
+
+export async function findPublishedPosts() {
+  const publishedPosts = await db
+    .select()
+    .from(posts)
+    .where(eq(posts.status, "PUBLISHED"))
+    .orderBy(desc(posts.published_at));
+  return publishedPosts;
 }
 
 export async function findPostById(id: string) {
@@ -202,7 +212,7 @@ export async function findPostDetailsBySlug(slug: string) {
 
     .innerJoin(categories, eq(posts.category_id, categories.id))
 
-    .where(eq(posts.slug, slug))
+    .where(and(eq(posts.slug, slug), eq(posts.status, "PUBLISHED")))
 
     .limit(1);
 
