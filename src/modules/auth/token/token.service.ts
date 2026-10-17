@@ -1,4 +1,4 @@
-import { jwtVerify, SignJWT } from "jose";
+import { jwtVerify, SignJWT, errors } from "jose";
 import { env } from "../../../config/env";
 import type { UserRole } from "../../../db/schema/users";
 import { accessTokenPayloadSchema } from "./token.types";
@@ -23,6 +23,7 @@ const secret = new TextEncoder().encode(env.jwtAccessSecret);
 function hashRefreshToken(token: string) {
   return createHash("sha256").update(token).digest("hex");
 }
+
 export async function createAccessToken(userId: string, role: UserRole) {
   const tokenVersion = await getUserTokenVersion(userId);
 
@@ -38,13 +39,24 @@ export async function createAccessToken(userId: string, role: UserRole) {
 }
 
 export async function verifyAccessToken(token: string) {
-  const { payload } = await jwtVerify(token, secret, {
-    algorithms: ["HS256"],
-  });
+  try {
+    const { payload } = await jwtVerify(token, secret, {
+      algorithms: ["HS256"],
+    });
 
-  return accessTokenPayloadSchema.parse(payload);
+    return accessTokenPayloadSchema.parse(payload);
+  } catch (error) {
+    if (error instanceof errors.JWTExpired) {
+      throw new AuthenticationError("Access token has expired.");
+    }
+
+    if (error instanceof errors.JOSEError) {
+      throw new AuthenticationError("Invalid access token.");
+    }
+
+    throw error;
+  }
 }
-
 // refresh token
 
 export async function createRefreshToken(userId: string, familyId?: string) {
