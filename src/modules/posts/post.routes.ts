@@ -9,6 +9,7 @@ import {
   getAuthorPostsController,
   getAuthorPostByIdController,
   updatePostController,
+  deletePostController,
 } from "./post.controller";
 
 export const postRouter = Router();
@@ -41,4 +42,11 @@ postRouter.patch(
   requireRole("AUTHOR", "ADMIN"),
   upload.single("coverImage"),
   updatePostController,
+);
+
+postRouter.delete(
+  "/me/:postId",
+  authMiddleware,
+  requireRole("AUTHOR", "ADMIN"),
+  deletePostController,
 );

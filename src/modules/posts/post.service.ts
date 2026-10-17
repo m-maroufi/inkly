@@ -1,3 +1,4 @@
+import { UserRole } from "../../db/schema/users";
 import {
   deleteImage,
   uploadImage,
@@ -8,6 +9,7 @@ import { generateSlug } from "../../shared/utils/slug";
 import { findCategoryById } from "../categories/category.repository";
 import {
   createPost,
+  deletePost,
   existsPostBySlug,
   findPostById,
   findPostDetailsBySlug,
@@ -137,11 +139,11 @@ export async function updatePostService(
     };
 
     const updatedPost = await updatePost(postId, updateData);
-    
+
     if (uploadedImage && post.cover_image_public_id) {
       await deleteImage(post.cover_image_public_id);
     }
-    
+
     return updatedPost;
   } catch (error) {
     // 6. Rollback Cloudinary upload
@@ -150,4 +152,36 @@ export async function updatePostService(
     }
     throw error;
   }
+}
+
+export async function deletePostService(
+  user: { id: string; role: UserRole },
+  postId: string,
+) {
+  const post = await findPostById(postId);
+  if (!post) {
+    throw new NotFoundError("Post not found.");
+  }
+  const isOwner = post.author_id === user.id;
+  const isAdmin = user.role === "ADMIN";
+
+  if (!isOwner && !isAdmin) {
+    throw new NotFoundError("Post not found.");
+  }
+
+  if (post.status === "PENDING_REVIEW") {
+    throw new ConflictError("Posts under review cannot be deleted.");
+  }
+
+  const deletedPost = await deletePost(postId);
+
+  if (!deletedPost) {
+    throw new NotFoundError("Post not found.");
+  }
+  
+  if (post.cover_image_public_id) {
+    await deleteImage(post.cover_image_public_id);
+  }
+
+  return deletedPost;
 }

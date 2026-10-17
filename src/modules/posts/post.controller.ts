@@ -1,6 +1,7 @@
 import { NextFunction, Response, Request } from "express";
 import {
   createPostService,
+  deletePostService,
   getAuthorPostByIdService,
   getAuthorPostsService,
   getPublishedPostDetailsService,
@@ -136,7 +137,7 @@ export async function updatePostController(
       throw new NotFoundError("Post not found.");
     }
     const imageBuffer = req.file?.buffer;
-    
+
     const data = updatePostSchema.parse(req.body);
 
     const post = await updatePostService(postId, authorId, data, imageBuffer);
@@ -144,6 +145,35 @@ export async function updatePostController(
     res.status(200).json({
       success: true,
       data: post,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function deletePostController(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    if (!req.user) {
+      throw new AuthenticationError("Authentication required.");
+    }
+    const postId = req.params.postId;
+
+    if (typeof postId !== "string" || !postId.trim()) {
+      throw new NotFoundError("Post not found.");
+    }
+
+    const deletedPost = await deletePostService(req.user, postId);
+    res.status(200).json({
+      success: true,
+      data: {
+        id: deletedPost.id,
+        title: deletedPost.title,
+        message: `Post "${deletedPost.title}" has been deleted successfully.`,
+      },
     });
   } catch (error) {
     next(error);
