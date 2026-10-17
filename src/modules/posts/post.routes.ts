@@ -8,6 +8,7 @@ import {
   getPublishedPostDetailsController,
   getAuthorPostsController,
   getAuthorPostByIdController,
+  updatePostController,
 } from "./post.controller";
 
 export const postRouter = Router();
@@ -32,4 +33,12 @@ postRouter.post(
   requireRole("AUTHOR", "ADMIN"),
   upload.single("coverImage"),
   createPostController,
+);
+
+postRouter.patch(
+  "/me/:postId",
+  authMiddleware,
+  requireRole("AUTHOR", "ADMIN"),
+  upload.single("coverImage"),
+  updatePostController,
 );

@@ -13,8 +13,9 @@ import {
   findPostDetailsBySlug,
   findPostsByAuthor,
   findPublishedPosts,
+  updatePost,
 } from "./post.repository";
-import { CreatePostInput } from "./post.types";
+import { CreatePostInput, UpdatePostInput } from "./post.types";
 
 export async function createPostService(
   data: CreatePostInput,
@@ -94,4 +95,59 @@ export async function getAuthorPostByIdService(
     throw new NotFoundError("Post not found.");
   }
   return post;
+}
+
+export async function updatePostService(
+  postId: string,
+  authorId: string,
+  data: UpdatePostInput,
+  imageBuffer?: Buffer,
+) {
+  const post = await findPostById(postId);
+  if (!post) {
+    throw new NotFoundError("Post not found.");
+  }
+  if (post.author_id !== authorId) {
+    throw new NotFoundError("Post not found.");
+  }
+
+  if (post.status !== "DRAFT") {
+    throw new ConflictError("Only draft posts can be edited.");
+  }
+
+  if (data.categoryId) {
+    const category = await findCategoryById(data.categoryId);
+    if (!category) {
+      throw new NotFoundError("Category not found.");
+    }
+  }
+
+  let uploadedImage;
+  if (imageBuffer) {
+    uploadedImage = await uploadImage(imageBuffer, "inkly/posts");
+  }
+
+  try {
+    const updateData = {
+      ...data,
+      ...(uploadedImage && {
+        coverImageUrl: uploadedImage.url,
+        coverImagePublicId: uploadedImage.publicId,
+      }),
+    };
+
+    const updatedPost = await updatePost(postId, updateData);
+    
+    if (uploadedImage && post.cover_image_public_id) {
+      await deleteImage(post.cover_image_public_id);
+    }
+    
+    return updatedPost;
+  } catch (error) {
+    // 6. Rollback Cloudinary upload
+    if (uploadedImage) {
+      await deleteImage(uploadedImage.publicId);
+    }
+    throw error;
+  }
 }
