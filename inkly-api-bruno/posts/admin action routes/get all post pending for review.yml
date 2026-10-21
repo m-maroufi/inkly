@@ -1,0 +1,73 @@
+info:
+  name: get all post pending for review
+  type: http
+  seq: 1
+
+http:
+  method: GET
+  url: "{{base_url}}/posts/admin/pending"
+  auth:
+    type: bearer
+    token: "{{accessToken}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+docs: |-
+  ## دریافت لیست پست‌های در انتظار بررسی
+
+  این اندپوینت لیست تمام پست‌هایی را که نویسندگان برای تایید ارسال کرده‌اند (`PENDING_REVIEW`) به ادمین نمایش می‌دهد.
+
+  ---
+
+  ### 📌 قوانین بیزینس لاجیک
+  - فقط پست‌هایی بازگردانده می‌شوند که وضعیت آن‌ها `PENDING_REVIEW` است.
+  - خروجی به ترتیب جدیدترین زمان ایجاد (`created_at DESC`) مرتب شده است.
+
+  ---
+
+  ### 🔐 احراز هویت و دسترسی
+  - **نوع توکن:** Bearer Token (`{{accessToken}}`)
+  - **نقش مجاز:** فقط `ADMIN`
+
+  ---
+
+  ### 🌐 مشخصات درخواست
+  - **متد:** `GET`
+  - **آدرس:** `{{base_url}}/posts/admin/pending`
+
+  ---
+
+  ### 📤 نمونه پاسخ موفق (`200 OK`)
+  ```json
+  {
+    "success": true,
+    "data": [
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440000",
+        "author_id": "36c5b3f9-da2b-4577-afe2-0ba225b98049",
+        "category_id": "6d4dad86-252e-4e63-aab0-0dd7cd2155e9",
+        "title": "عنوان پست در حال بررسی",
+        "excerpt": "خلاصه پست...",
+        "slug": "post-slug",
+        "content": "متن کامل...",
+        "status": "PENDING_REVIEW",
+        "cover_image_url": "https://res.cloudinary.com/.../img.jpg",
+        "created_at": "2026-10-21T10:00:00.000Z",
+        "updated_at": "2026-10-21T11:00:00.000Z"
+      }
+    ]
+  }
+  ```
+
+  ---
+
+  ### ❌ خطاهای احتمالی
+  | کد وضعیت | پیام / علت |
+  |----------|------------|
+  | `401 Unauthorized` | کاربر لاگین نکرده یا توکن نامعتبر است |
+  | `403 Forbidden` | کاربر دسترسی `ADMIN` ندارد |

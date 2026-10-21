@@ -1,16 +1,26 @@
 import { NextFunction, Response, Request } from "express";
 import {
+  approvePostService,
   createPostService,
   deletePostService,
   getAuthorPostByIdService,
   getAuthorPostsService,
+  getPendingPostsService,
   getPublishedPostDetailsService,
   getPublishedPostsService,
+  publishPostService,
+  rejectPostService,
+  submitPostForReviewService,
   updatePostService,
 } from "./post.service";
-import { createPostSchema, updatePostSchema } from "./post.schema";
+import {
+  createPostSchema,
+  rejectPostSchema,
+  updatePostSchema,
+} from "./post.schema";
 import { AuthenticationError } from "../../shared/errors/authentication-error";
 import { NotFoundError } from "../../shared/errors/not-found-error";
+import { AuthorizationError } from "../../shared/errors/authorization-error";
 
 export async function createPostController(
   req: Request,
@@ -173,6 +183,160 @@ export async function deletePostController(
         id: deletedPost.id,
         title: deletedPost.title,
         message: `Post "${deletedPost.title}" has been deleted successfully.`,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function submitPostForReviewController(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    if (!req.user) {
+      throw new AuthenticationError("Authentication required.");
+    }
+    const postId = req.params.postId;
+
+    if (typeof postId !== "string" || !postId.trim()) {
+      throw new NotFoundError("Post not found.");
+    }
+    const post = await submitPostForReviewService(req.user.id, postId);
+    res.status(200).json({
+      success: true,
+      data: {
+        id: post.id,
+        title: post.title,
+        status: post.status,
+        message: "Post submitted for review successfully.",
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+// admin controller -> only admin access that controller
+
+export async function getPendingPostsController(
+  _req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const posts = await getPendingPostsService();
+    res.status(200).json({
+      success: true,
+      data: posts,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function approvePostController(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    if (!req.user) {
+      throw new AuthenticationError("Authentication required.");
+    }
+    if (req.user.role !== "ADMIN") {
+      throw new AuthorizationError(
+        "You do not have permission to perform this action.",
+      );
+    }
+    const postId = req.params.postId;
+
+    if (typeof postId !== "string" || !postId.trim()) {
+      throw new NotFoundError("Post not found.");
+    }
+    const post = await approvePostService(postId);
+    res.status(200).json({
+      success: true,
+      data: {
+        id: post.id,
+        title: post.title,
+        status: post.status,
+        message: "Post approved successfully.",
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function rejectPostController(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    if (!req.user) {
+      throw new AuthenticationError("Authentication required.");
+    }
+    if (req.user.role !== "ADMIN") {
+      throw new AuthorizationError(
+        "You do not have permission to perform this action.",
+      );
+    }
+    const postId = req.params.postId;
+
+    if (typeof postId !== "string" || !postId.trim()) {
+      throw new NotFoundError("Post not found.");
+    }
+    const { reason } = rejectPostSchema.parse(req.body);
+
+    const post = await rejectPostService(postId, reason);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        id: post.id,
+        title: post.title,
+        status: post.status,
+        reason,
+        message: "Post rejected.",
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function publishPostController(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    if (!req.user) {
+      throw new AuthenticationError("Authentication required.");
+    }
+    if (req.user.role !== "ADMIN") {
+      throw new AuthorizationError(
+        "You do not have permission to perform this action.",
+      );
+    }
+    const postId = req.params.postId;
+
+    if (typeof postId !== "string" || !postId.trim()) {
+      throw new NotFoundError("Post not found.");
+    }
+    const post = await publishPostService(postId);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        id: post.id,
+        title: post.title,
+        status: post.status,
+        message: "Post published successfully.",
       },
     });
   } catch (error) {

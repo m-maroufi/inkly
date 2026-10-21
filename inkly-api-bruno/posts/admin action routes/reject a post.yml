@@ -1,0 +1,93 @@
+info:
+  name: reject a post
+  type: http
+  seq: 3
+
+http:
+  method: PATCH
+  url: "{{base_url}}/posts/admin/{{postId}}/reject"
+  body:
+    type: json
+    data: |-
+      {
+        "reason": "متن پست ناقص است و نیاز به ویرایش دارد."
+      }
+  auth:
+    type: bearer
+    token: "{{accessToken}}"
+
+runtime:
+  variables:
+    - name: postId
+      value: 4e279a24-757b-4720-85fa-a54afcf75eeb
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+docs: |-
+  ## رد کردن پست توسط ادمین
+
+  این اندپوینت برای رد یک پست و بازگرداندن آن به نویسنده به همراه **دلیل رد** استفاده می‌شود.
+
+  ---
+
+  ### 📌 قوانین بیزینس لاجیک
+  - **شرط وضعیت:** تنها پست‌هایی که در وضعیت **`PENDING_REVIEW`** باشند قابل رد شدن هستند (در غیر این صورت `409 Conflict`).
+  - **دلیل رد (اجباری):** ارسال فیلد `reason` در بدنه درخواست اجباری است (حداکثر ۱۰۰۰ کاراکتر).
+  - پس از رد شدن، وضعیت پست به **`REJECTED`** تغییر یافته و دلیل در `rejection_reason` ذخیره می‌شود تا نویسنده بتواند آن را ببیند و اصلاح کند.
+
+  ---
+
+  ### 🔐 احراز هویت و دسترسی
+  - **نوع توکن:** Bearer Token (`{{accessToken}}`)
+  - **نقش مجاز:** فقط `ADMIN`
+
+  ---
+
+  ### 🌐 مشخصات درخواست
+  - **متد:** `PATCH`
+  - **آدرس:** `{{base_url}}/posts/admin/:postId/reject`
+  - **نوع بدنه (Body):** `JSON`
+
+  #### پارامترهای URL:
+  | پارامتر | نوع | توضیح |
+  |---------|-----|-------|
+  | `postId` | `UUID` | شناسه یکتای پستی که باید رد شود |
+
+  #### بدنه درخواست (JSON):
+  ```json
+  {
+    "reason": "متن پست ناقص است و نیاز به ویرایش نگارشی دارد."
+  }
+  ```
+
+  ---
+
+  ### 📤 نمونه پاسخ موفق (`200 OK`)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "550e8400-e29b-41d4-a716-446655440000",
+      "title": "عنوان پست",
+      "status": "REJECTED",
+      "reason": "متن پست ناقص است و نیاز به ویرایش نگارشی دارد.",
+      "message": "Post rejected."
+    }
+  }
+  ```
+
+  ---
+
+  ### ❌ خطاهای احتمالی
+  | کد وضعیت | پیام / علت |
+  |----------|------------|
+  | `400 Bad Request` | فیلد `reason` ارسال نشده یا بیشتر از ۱۰۰۰ کاراکتر است |
+  | `401 Unauthorized` | کاربر احراز هویت نشده است |
+  | `403 Forbidden` | کاربر ادمین نیست |
+  | `404 Not Found` | پست یافت نشد |
+  | `409 Conflict` | وضعیت پست در صف بررسی نیست |

@@ -1,0 +1,72 @@
+info:
+  name: post submit for review
+  type: http
+  seq: 8
+
+http:
+  method: PATCH
+  url: "{{base_url}}/posts/me/{{postId}}/submit"
+  auth:
+    type: bearer
+    token: "{{accessToken}}"
+
+runtime:
+  variables:
+    - name: postId
+      value: 4e279a24-757b-4720-85fa-a54afcf75eeb
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+docs: |-
+  ## ارسال پست برای بررسی توسط ادمین
+
+  این اندپوینت توسط **نویسنده** برای ارسال پیش‌نویس به صف بررسی ادمین استفاده می‌شود.
+
+  ---
+
+  ### 📌 قوانین بیزینس لاجیک
+  - **وضعیت‌های مجاز:** فقط پست‌هایی که در وضعیت **`DRAFT`** یا **`REJECTED`** هستند می‌توانند ارسال شوند.
+  - در صورتی که پست در وضعیت `PENDING_REVIEW` یا `PUBLISHED` باشد، خطای `409 Conflict` بازگردانده می‌شود.
+  - پس از ارسال موفق، وضعیت پست به **`PENDING_REVIEW`** تغییر کرده و فیلد `rejection_reason` (در صورت وجود) پاک می‌شود.
+
+  ---
+
+  ### 🔐 احراز هویت و دسترسی
+  - **نوع توکن:** Bearer Token (`{{accessToken}}`)
+  - **نقش‌های مجاز:** `AUTHOR`, `ADMIN`
+
+  ---
+
+  ### 🌐 مشخصات درخواست
+  - **متد:** `PATCH`
+  - **آدرس:** `{{base_url}}/posts/me/:postId/submit`
+
+  ---
+
+  ### 📤 نمونه پاسخ موفق (`200 OK`)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "550e8400-e29b-41d4-a716-446655440000",
+      "title": "عنوان پست",
+      "status": "PENDING_REVIEW",
+      "message": "Post submitted for review successfully."
+    }
+  }
+  ```
+
+  ---
+
+  ### ❌ خطاهای احتمالی
+  | کد وضعیت | پیام / علت |
+  |----------|------------|
+  | `401 Unauthorized` | کاربر لاگین نکرده یا توکن نامعتبر است |
+  | `403 Forbidden` | کاربر نقش مجاز ندارد |
+  | `404 Not Found` | پست پیدا نشد یا متعلق به این نویسنده نیست |
+  | `409 Conflict` | وضعیت پست DRAFT یا REJECTED نیست |

@@ -1,0 +1,76 @@
+info:
+  name: approved a post
+  type: http
+  seq: 2
+
+http:
+  method: PATCH
+  url: "{{base_url}}/posts/admin/{{postId}}/approve"
+  auth:
+    type: bearer
+    token: "{{accessToken}}"
+
+runtime:
+  variables:
+    - name: postId
+      value: 4e279a24-757b-4720-85fa-a54afcf75eeb
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+docs: |-
+  ## تأیید پست توسط ادمین
+
+  این اندپوینت برای تایید یک پستِ در صف بررسی توسط **ادمین سیستم** استفاده می‌شود.
+
+  ---
+
+  ### 📌 قوانین بیزینس لاجیک
+  - **شرط وضعیت:** تنها پست‌هایی که در وضعیت **`PENDING_REVIEW`** باشند قابل تایید هستند (در غیر این صورت `409 Conflict`).
+  - پس از تایید موفق، وضعیت پست به **`APPROVED`** تغییر می‌کند و فیلد `rejection_reason` پاک می‌شود.
+
+  ---
+
+  ### 🔐 احراز هویت و دسترسی
+  - **نوع توکن:** Bearer Token (`{{accessToken}}`)
+  - **نقش مجاز:** فقط `ADMIN`
+
+  ---
+
+  ### 🌐 مشخصات درخواست
+  - **متد:** `PATCH`
+  - **آدرس:** `{{base_url}}/posts/admin/:postId/approve`
+
+  #### پارامترهای URL:
+  | پارامتر | نوع | توضیح |
+  |---------|-----|-------|
+  | `postId` | `UUID` | شناسه یکتای پستی که باید تأیید شود |
+
+  ---
+
+  ### 📤 نمونه پاسخ موفق (`200 OK`)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "550e8400-e29b-41d4-a716-446655440000",
+      "title": "عنوان پست",
+      "status": "APPROVED",
+      "message": "Post approved successfully."
+    }
+  }
+  ```
+
+  ---
+
+  ### ❌ خطاهای احتمالی
+  | کد وضعیت | پیام / علت |
+  |----------|------------|
+  | `401 Unauthorized` | کاربر لاگین نکرده یا توکن منقضی است |
+  | `403 Forbidden` | فقط کاربران `ADMIN` مجاز به تایید هستند |
+  | `404 Not Found` | پست با این شناسه یافت نشد |
+  | `409 Conflict` | وضعیت پست `PENDING_REVIEW` نیست |

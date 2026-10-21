@@ -11,11 +11,13 @@ import {
   createPost,
   deletePost,
   existsPostBySlug,
+  findPendingPosts,
   findPostById,
   findPostDetailsBySlug,
   findPostsByAuthor,
   findPublishedPosts,
   updatePost,
+  updatePostStatus,
 } from "./post.repository";
 import { CreatePostInput, UpdatePostInput } from "./post.types";
 
@@ -178,10 +180,64 @@ export async function deletePostService(
   if (!deletedPost) {
     throw new NotFoundError("Post not found.");
   }
-  
+
   if (post.cover_image_public_id) {
     await deleteImage(post.cover_image_public_id);
   }
 
   return deletedPost;
+}
+
+export async function getPendingPostsService() {
+  return findPendingPosts();
+}
+
+export async function submitPostForReviewService(
+  authorId: string,
+  postId: string,
+) {
+  const post = await findPostById(postId);
+  if (!post || post.author_id !== authorId) {
+    throw new NotFoundError("Post not found.");
+  }
+
+  if (post.status !== "DRAFT" && post.status !== "REJECTED") {
+    throw new ConflictError(
+      "Only draft or rejected posts can be submitted for review.",
+    );
+  }
+  return updatePostStatus(postId, "PENDING_REVIEW", { rejectionReason: null });
+}
+
+export async function approvePostService(postId: string) {
+  const post = await findPostById(postId);
+  if (!post) throw new NotFoundError("Post not found.");
+  if (post.status !== "PENDING_REVIEW") {
+    throw new ConflictError("Only posts pending review can be approved.");
+  }
+
+  return updatePostStatus(postId, "APPROVED", { rejectionReason: null });
+}
+
+export async function publishPostService(postId: string) {
+  const post = await findPostById(postId);
+  if (!post) throw new NotFoundError("Post not found.");
+  if (post.status !== "APPROVED") {
+    throw new ConflictError("Only posts APPROVED can be published.");
+  }
+
+  return updatePostStatus(postId, "PUBLISHED", {
+    rejectionReason: null,
+    publishedAt: new Date(),
+  });
+}
+
+export async function rejectPostService(postId: string, reason: string) {
+  const post = await findPostById(postId);
+  if (!post) throw new NotFoundError("Post not found.");
+  if (post.status !== "PENDING_REVIEW") {
+    throw new ConflictError("Only posts pending review can be rejected.");
+  }
+
+  return updatePostStatus(postId, "REJECTED", { rejectionReason: reason });
 }

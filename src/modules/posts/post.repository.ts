@@ -1,6 +1,6 @@
 import { desc, eq, sql } from "drizzle-orm";
 import { db } from "../../db";
-import { posts } from "../../db/schema/posts";
+import { posts, PostStatus } from "../../db/schema/posts";
 import { CreatePostRepositoryInput, UpdatePostInput } from "./post.types";
 import { handleDatabaseError } from "../../shared/errors/database-error";
 import { users } from "../../db/schema/users";
@@ -11,6 +11,7 @@ import { post_views } from "../../db/schema/post_views";
 import { tags } from "../../db/schema/tags";
 import { post_tags } from "../../db/schema/post_tags";
 import { and } from "drizzle-orm";
+import { NotFoundError } from "../../shared/errors/not-found-error";
 
 export async function findAllPosts() {
   const result = await db.select().from(posts).orderBy(desc(posts.created_at));
@@ -237,4 +238,45 @@ export async function findPostDetailsBySlug(slug: string) {
     ...result[0],
     tags: postTags,
   };
+}
+
+export async function findPendingPosts() {
+  const pendingPosts = await db
+    .select()
+    .from(posts)
+    .where(eq(posts.status, "PENDING_REVIEW"))
+    .orderBy(desc(posts.created_at));
+  return pendingPosts;
+}
+
+export async function updatePostStatus(
+  id: string,
+  status: PostStatus,
+  extraData?: {
+    rejectionReason?: string | null;
+    publishedAt?: Date | null;
+  },
+) {
+  try {
+    const [updatedPost] = await db
+      .update(posts)
+      .set({
+        status,
+        ...(extraData?.rejectionReason !== undefined && {
+          rejection_reason: extraData.rejectionReason,
+        }),
+        ...(extraData?.publishedAt !== undefined && {
+          published_at: extraData.publishedAt,
+        }),
+        updated_at: new Date(),
+      })
+      .where(eq(posts.id, id))
+      .returning();
+    if (!updatedPost) {
+      throw new NotFoundError("Post not found.");
+    }
+    return updatedPost;
+  } catch (error) {
+    handleDatabaseError(error);
+  }
 }

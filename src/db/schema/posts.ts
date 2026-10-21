@@ -70,3 +70,4 @@ export const posts = pgTable(
     index("posts_status_published_at_idx").on(table.status, table.published_at),
   ],
 );
+export type PostStatus = (typeof postStatus.enumValues)[number];

@@ -1,0 +1,76 @@
+info:
+  name: "publish a post "
+  type: http
+  seq: 4
+
+http:
+  method: PATCH
+  url: "{{base_url}}/posts/admin/{{postId}}/publish"
+  auth:
+    type: bearer
+    token: "{{accessToken}}"
+
+runtime:
+  variables:
+    - name: postId
+      value: 4e279a24-757b-4720-85fa-a54afcf75eeb
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+docs: |-
+  ## انتشار نهایی پست توسط ادمین
+
+  این اندپوینت برای انتشار عمومی یک پستِ تأیید شده استفاده می‌شود و پس از آن در لیست مقالات عمومی سایت نمایش داده خواهد شد.
+
+  ---
+
+  ### 📌 قوانین بیزینس لاجیک
+  - **شرط وضعیت:** تنها پست‌هایی که در وضعیت **`APPROVED`** باشند امکان انتشار نهایی دارند (در غیر این صورت `409 Conflict`).
+  - پس از اجرا، وضعیت پست به **`PUBLISHED`** تغییر کرده و مقدار زمان فعلی در فیلد `published_at` ثبت می‌گردد.
+
+  ---
+
+  ### 🔐 احراز هویت و دسترسی
+  - **نوع توکن:** Bearer Token (`{{accessToken}}`)
+  - **نقش مجاز:** فقط `ADMIN`
+
+  ---
+
+  ### 🌐 مشخصات درخواست
+  - **متد:** `PATCH`
+  - **آدرس:** `{{base_url}}/posts/admin/:postId/publish`
+
+  #### پارامترهای URL:
+  | پارامتر | نوع | توضیح |
+  |---------|-----|-------|
+  | `postId` | `UUID` | شناسه یکتای پستی که باید منتشر شود |
+
+  ---
+
+  ### 📤 نمونه پاسخ موفق (`200 OK`)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "550e8400-e29b-41d4-a716-446655440000",
+      "title": "عنوان پست",
+      "status": "PUBLISHED",
+      "message": "Post published successfully."
+    }
+  }
+  ```
+
+  ---
+
+  ### ❌ خطاهای احتمالی
+  | کد وضعیت | پیام / علت |
+  |----------|------------|
+  | `401 Unauthorized` | کاربر لاگین نکرده یا توکن منقضی است |
+  | `403 Forbidden` | فقط ادمین اجازه انتشار دارد |
+  | `404 Not Found` | پست یافت نشد |
+  | `409 Conflict` | پست در وضعیت `APPROVED` قرار ندارد |
