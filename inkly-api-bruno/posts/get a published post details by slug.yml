@@ -11,7 +11,7 @@ http:
 runtime:
   variables:
     - name: slug
-      value: چطور-یک-فضای-کاری-مینیمال-بسازیم
+      value: ساخت-فضای-کاری-برای-برنامه-نویسی
 
 settings:
   encodeUrl: true

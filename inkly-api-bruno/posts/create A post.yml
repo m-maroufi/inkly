@@ -11,7 +11,7 @@ http:
     data:
       - name: title
         type: text
-        value: چطور یک فضای کاری مینیمال بسازیم؟
+        value: "ساخت فضای کاری برای برنامه نویسی "
       - name: excerpt
         type: text
         value: با چند تغییر ساده، فضایی آرام، کاربردی و الهام‌بخش برای تمرکز و خلاقیت بسازید.
@@ -58,6 +58,9 @@ http:
         value:
           - /home/mehti/Downloads/TuVtflS8k.jpg
         contentType: image/jpeg
+      - name: tagIds
+        type: text
+        value: '["cab074f3-8785-4d84-aedc-67e15e6c0c99","128574d4-30b1-4d7f-ae67-eb749d8dc660"]'
   auth:
     type: bearer
     token: "{{accessToken}}"

@@ -3,11 +3,13 @@ import {
   deleteImage,
   uploadImage,
 } from "../../lib/cloudinary/cloudinary.service";
+import { AppError } from "../../shared/errors/app-error";
 import { ConflictError } from "../../shared/errors/conflict-error";
 import { NotFoundError } from "../../shared/errors/not-found-error";
 import { generateSlug } from "../../shared/utils/slug";
 import { findCategoryById } from "../categories/category.repository";
 import {
+  attachTagsToPost,
   createPost,
   deletePost,
   existsPostBySlug,
@@ -16,6 +18,9 @@ import {
   findPostDetailsBySlug,
   findPostsByAuthor,
   findPublishedPosts,
+  findTagsByIds,
+  findTagsByPostId,
+  syncPostTags,
   updatePost,
   updatePostStatus,
 } from "./post.repository";
@@ -31,6 +36,12 @@ export async function createPostService(
 
   if (!category) {
     throw new NotFoundError("Category not found");
+  }
+  if (data.tagIds && data.tagIds.length > 0) {
+    const existingTags = await findTagsByIds(data.tagIds);
+    if (existingTags.length !== data.tagIds.length) {
+      throw new NotFoundError("One or more tags not found.");
+    }
   }
   //create and check exist slug
   const slug = generateSlug(data.title);
@@ -57,8 +68,17 @@ export async function createPostService(
       authorId,
       slug,
     );
+    if (!post) {
+      throw new AppError("Failed to create post.", 500);
+    }
+    // اتصال تگ‌ها به پست
+    if (data.tagIds && data.tagIds.length > 0) {
+      await attachTagsToPost(post.id, data.tagIds);
+    }
+    // واکشی تگ‌های پست برای ارسال در خروجی
+    const tags = await findTagsByPostId(post.id);
 
-    return post;
+    return { ...post, tags };
   } catch (error) {
     // 6. Rollback Cloudinary upload
     if (uploadedImage) {
@@ -92,13 +112,16 @@ export async function getAuthorPostByIdService(
   postId: string,
 ) {
   const post = await findPostById(postId);
-  if (!post) {
+  if (!post || post.author_id !== authorId) {
     throw new NotFoundError("Post not found.");
   }
-  if (post.author_id !== authorId) {
-    throw new NotFoundError("Post not found.");
-  }
-  return post;
+
+  const tags = await findTagsByPostId(postId);
+
+  return {
+    ...post,
+    tags,
+  };
 }
 
 export async function updatePostService(
@@ -125,6 +148,12 @@ export async function updatePostService(
       throw new NotFoundError("Category not found.");
     }
   }
+  if (data.tagIds && data.tagIds.length > 0) {
+    const existingTags = await findTagsByIds(data.tagIds);
+    if (existingTags.length !== data.tagIds.length) {
+      throw new NotFoundError("One or more tags not found.");
+    }
+  }
 
   let uploadedImage;
   if (imageBuffer) {
@@ -141,12 +170,24 @@ export async function updatePostService(
     };
 
     const updatedPost = await updatePost(postId, updateData);
+    if (!updatedPost) {
+      throw new NotFoundError("Post not found.");
+    }
+    // همگام‌سازی تگ‌ها (اگر کاربر فیلد tagIds رو فرستاده بود)
+    if (data.tagIds !== undefined) {
+      await syncPostTags(postId, data.tagIds);
+    }
 
+    // واکشی تگ‌های جدید برای بازگرداندن به فرانت
+    const tags = await findTagsByPostId(postId);
     if (uploadedImage && post.cover_image_public_id) {
       await deleteImage(post.cover_image_public_id);
     }
 
-    return updatedPost;
+    return {
+      ...updatedPost,
+      tags,
+    };
   } catch (error) {
     // 6. Rollback Cloudinary upload
     if (uploadedImage) {

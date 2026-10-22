@@ -10,7 +10,7 @@ http:
     type: json
     data: |-
       {
-        "name": "برنامه نویسی"
+        "name": "بک اند"
       }
   auth:
     type: bearer

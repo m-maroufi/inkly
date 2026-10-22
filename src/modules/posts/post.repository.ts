@@ -1,4 +1,4 @@
-import { desc, eq, sql } from "drizzle-orm";
+import { desc, eq, inArray, sql } from "drizzle-orm";
 import { db } from "../../db";
 import { posts, PostStatus } from "../../db/schema/posts";
 import { CreatePostRepositoryInput, UpdatePostInput } from "./post.types";
@@ -279,4 +279,55 @@ export async function updatePostStatus(
   } catch (error) {
     handleDatabaseError(error);
   }
+}
+
+export async function findTagsByIds(tagIds: string[]) {
+  if (tagIds.length === 0) {
+    return [];
+  }
+
+  const result = await db.select().from(tags).where(inArray(tags.id, tagIds));
+
+  return result;
+}
+
+export async function attachTagsToPost(postId: string, tagIds: string[]) {
+  if (tagIds.length === 0) return;
+
+  const records = tagIds.map((tagId) => ({
+    post_id: postId,
+    tag_id: tagId,
+  }));
+
+  // با onConflictDoNothing اگه کاربر تگ تکراری فرستاده بود، بدون خطا ازش رد میشه
+  await db.insert(post_tags).values(records).onConflictDoNothing();
+}
+
+export async function syncPostTags(postId: string, tagIds: string[]) {
+  await db.transaction(async (tx) => {
+    // ۱. پاک کردن تگ‌های قبلی پست
+    await tx.delete(post_tags).where(eq(post_tags.post_id, postId));
+
+    // ۲. درج تگ‌های جدید در صورت وجود
+    if (tagIds.length > 0) {
+      const records = tagIds.map((tagId) => ({
+        post_id: postId,
+        tag_id: tagId,
+      }));
+
+      await tx.insert(post_tags).values(records).onConflictDoNothing();
+    }
+  });
+}
+
+export async function findTagsByPostId(postId: string) {
+  return db
+    .select({
+      id: tags.id,
+      name: tags.name,
+      slug: tags.slug,
+    })
+    .from(post_tags)
+    .innerJoin(tags, eq(post_tags.tag_id, tags.id))
+    .where(eq(post_tags.post_id, postId));
 }

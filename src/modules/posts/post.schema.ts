@@ -1,5 +1,21 @@
 import { z } from "zod";
 
+const tagIdsSchema = z.preprocess(
+  (val) => {
+    if (!val) return undefined;
+    if (typeof val === "string") {
+      try {
+        const parsed = JSON.parse(val);
+        if (Array.isArray(parsed)) return parsed;
+      } catch {
+        // اگر استرینگ تک بود
+      }
+      return [val];
+    }
+    return val;
+  },
+  z.array(z.uuid("Invalid tag ID.")).optional(),
+);
 export const createPostSchema = z.object({
   title: z.string().trim().min(1, "Title is required.").max(200),
 
@@ -34,6 +50,7 @@ export const createPostSchema = z.object({
     .min(1, "Cover image alt cannot be empty.")
     .max(200)
     .optional(),
+  tagIds: tagIdsSchema,
 });
 
 export const updatePostSchema = z.object({
@@ -74,6 +91,9 @@ export const updatePostSchema = z.object({
     .min(1, "Cover image alt cannot be empty.")
     .max(200)
     .optional(),
+
+  
+  tagIds: tagIdsSchema,
 });
 
 export const rejectPostSchema = z.object({
