@@ -4,4 +4,4 @@ variables:
   - name: base_url
     value: http://localhost:3000/api/v1
   - name: accessToken
-    value: eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiQURNSU4iLCJ2ZXIiOjEsInN1YiI6IjM2YzViM2Y5LWRhMmItNDU3Ny1hZmUyLTBiYTIyNWI5ODA0OSIsImlhdCI6MTc5MjU3MjUyNiwiZXhwIjoxNzkyNTczNDI2fQ.9NdDGI8nWesJ7BV4vfe5FvH8kdhvst01b-2EirnJFcg
+    value: eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiQURNSU4iLCJ2ZXIiOjEsInN1YiI6IjM2YzViM2Y5LWRhMmItNDU3Ny1hZmUyLTBiYTIyNWI5ODA0OSIsImlhdCI6MTc5MjY4NTM4NSwiZXhwIjoxNzkyNjg2Mjg1fQ.Z4nKFTluIhO2gSOCH8vIni3cqTbWc132bASKOjqoAxY
