@@ -1,0 +1,82 @@
+info:
+  name: Check Like Status
+  type: http
+  seq: 2
+
+http:
+  method: GET
+  url: "{{base_url}}/likes/post/{{postId}}/status"
+  auth:
+    type: bearer
+    token: "{{accessToken}}"
+
+runtime:
+  variables:
+    - name: postId
+      value: b7741389-61fc-4b86-89be-b82e7e32a28c
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+docs: |-
+  ## بررسی وضعیت لایک کاربر فعلی (Check Like Status)
+
+  این اندپوینت برای بررسی اینکه آیا کاربر لاگین کرده در حال حاضر این پست را لایک کرده است یا خیر استفاده می‌شود (جهت پر رنگ یا توخالی نشان دادن آیکون قلب در رابط کاربری فرانت‌اند).
+
+  ---
+
+  ### 📌 قوانین بیزینس لاجیک
+  - **وضعیت پست:** پست هدف باید حتماً در وضعیت `PUBLISHED` باشد؛ در غیر این صورت خطای `404 Not Found` بازگردانده می‌شود.
+  - **نتیجه پاسخ:** 
+    - در صورت لایک بودن: `{ "liked": true }`
+    - در صورت لایک نبودن: `{ "liked": false }`
+
+  ---
+
+  ### 🔐 احراز هویت و دسترسی
+  - **نوع توکن:** Bearer Token (`{{accessToken}}`)
+  - **نقش‌های مجاز:** تمام کاربران لاگین کرده (`USER`, `AUTHOR`, `ADMIN`)
+
+  ---
+
+  ### 🌐 مشخصات درخواست
+  - **متد:** `GET`
+  - **آدرس:** `{{base_url}}/likes/post/:postId/status`
+  - **بدنه:** ندارد
+
+  ---
+
+  ### 📤 نمونه پاسخ موفق (`200 OK`)
+
+  #### اگر کاربر قبلاً پست را لایک کرده باشد:
+  ```json
+  {
+    "success": true,
+    "data": {
+      "liked": true
+    }
+  }
+  ```
+
+  #### اگر کاربر پست را لایک نکرده باشد:
+  ```json
+  {
+    "success": true,
+    "data": {
+      "liked": false
+    }
+  }
+  ```
+
+  ---
+
+  ### ❌ خطاهای احتمالی
+  | کد وضعیت | پیام / علت |
+  |----------|------------|
+  | `400 Bad Request` | فرمت پارامتر `postId` در URL نامعتبر است (UUID نیست) |
+  | `401 Unauthorized` | کاربر لاگین نکرده است یا توکن نامعتبر است |
+  | `404 Not Found` | پست یافت نشد یا در وضعیت منتشر شده قرار ندارد |

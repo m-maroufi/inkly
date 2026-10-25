@@ -1,0 +1,85 @@
+info:
+  name: Toggle Like Post
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{base_url}}/likes/post/{{postId}}"
+  auth:
+    type: bearer
+    token: "{{accessToken}}"
+
+runtime:
+  variables:
+    - name: postId
+      value: b7741389-61fc-4b86-89be-b82e7e32a28c
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+docs: |-
+  ## لایک یا آن‌لایک کردن پست (Toggle Like)
+
+  این اندپوینت برای لایک کردن یا برداشتن لایک (Unlike) از روی یک پست منتشر شده توسط کاربر لاگین کرده استفاده می‌شود.
+
+  ---
+
+  ### 📌 قوانین بیزینس لاجیک
+  - **عملکرد دوطرفه (Toggle):** 
+    - اگر کاربر قبلاً پست را لایک **نکرده باشد**: یک رکورد لایک جدید ثبت شده و `liked: true` بازگردانده می‌شود.
+    - اگر کاربر قبلاً پست را لایک **کرده باشد**: رکورد لایک حذف شده و `liked: false` بازگردانده می‌شود.
+  - **وضعیت پست:** لایک کردن تنها روی پست‌هایی با وضعیت `PUBLISHED` مجاز است (برای سایر وضعیت‌ها خطای `404 Not Found`).
+  - **کلید ترکیبی:** در سطح دیتابیس ترکیب `(user_id, post_id)` یکتاست و امکان ثبت لایک تکراری وجود ندارد.
+
+  ---
+
+  ### 🔐 احراز هویت و دسترسی
+  - **نوع توکن:** Bearer Token (`{{accessToken}}`)
+  - **نقش‌های مجاز:** تمام کاربران لاگین کرده (`USER`, `AUTHOR`, `ADMIN`)
+
+  ---
+
+  ### 🌐 مشخصات درخواست
+  - **متد:** `POST`
+  - **آدرس:** `{{base_url}}/likes/post/:postId`
+  - **بدنه:** ندارد
+
+  ---
+
+  ### 📤 نمونه پاسخ موفق (`200 OK`)
+
+  #### در صورت ثبت لایک جدید:
+  ```json
+  {
+    "success": true,
+    "data": {
+      "liked": true,
+      "likesCount": 1
+    }
+  }
+  ```
+
+  #### در صورت برداشتن لایک (Unlike):
+  ```json
+  {
+    "success": true,
+    "data": {
+      "liked": false,
+      "likesCount": 0
+    }
+  }
+  ```
+
+  ---
+
+  ### ❌ خطاهای احتمالی
+  | کد وضعیت | پیام / علت |
+  |----------|------------|
+  | `400 Bad Request` | فرمت شناسه `postId` در URL نامعتبر است (UUID معتبر نیست) |
+  | `401 Unauthorized` | کاربر لاگین نکرده یا توکن منقضی است |
+  | `404 Not Found` | پست با این شناسه یافت نشد یا در وضعیت منتشر شده نیست |

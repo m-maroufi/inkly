@@ -1,0 +1,80 @@
+info:
+  name: Get Post Likes
+  type: http
+  seq: 3
+
+http:
+  method: GET
+  url: "{{base_url}}/likes/post/{{postId}}"
+
+runtime:
+  variables:
+    - name: postId
+      value: b7741389-61fc-4b86-89be-b82e7e32a28c
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+docs: |-
+  ## دریافت آمار و لیست کاربران لایک‌کننده پست
+
+  این اندپوینت عمومی برای دریافت تعداد کل لایک‌ها و مشخصات کاربرانی که این پست را لایک کرده‌اند استفاده می‌شود.
+
+  ---
+
+  ### 📌 قوانین بیزینس لاجیک
+  - **وضعیت پست:** پست باید حتماً در وضعیت `PUBLISHED` باشد؛ در غیر این صورت خطای `404 Not Found` بازگردانده می‌شود.
+  - **اطلاعات کاربران:** برای هر کاربر فیلدهای عمومی (`id`, `username`, `displayName`, `avatarUrl`) به همراه زمان ثبت لایک (`likedAt`) بازگردانده می‌شود.
+  - **ترتیب نمایش:** کاربران بر اساس زمان ثبت لایک به صورت نزولی (از جدیدترین لایک به قدیمی‌ترین) مرتب هستند.
+
+  ---
+
+  ### 🔐 احراز هویت و دسترسی
+  - **نوع دسترسی:** عمومی (Public - بدون نیاز به توکن احراز هویت)
+
+  ---
+
+  ### 🌐 مشخصات درخواست
+  - **متد:** `GET`
+  - **آدرس:** `{{base_url}}/likes/post/:postId`
+  - **بدنه:** ندارد
+
+  ---
+
+  ### 📤 نمونه پاسخ موفق (`200 OK`)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "likesCount": 2,
+      "users": [
+        {
+          "id": "u1111111-1111-1111-1111-111111111111",
+          "username": "mehdi",
+          "displayName": "مهدی",
+          "avatarUrl": null,
+          "likedAt": "2026-10-25T11:23:00.000Z"
+        },
+        {
+          "id": "u2222222-2222-2222-2222-222222222222",
+          "username": "ali",
+          "displayName": "علی رضایی",
+          "avatarUrl": "https://res.cloudinary.com/demo/image/upload/sample.jpg",
+          "likedAt": "2026-10-25T10:15:00.000Z"
+        }
+      ]
+    }
+  }
+  ```
+
+  ---
+
+  ### ❌ خطاهای احتمالی
+  | کد وضعیت | پیام / علت |
+  |----------|------------|
+  | `400 Bad Request` | فرمت `postId` در URL نامعتبر است (UUID نیست) |
+  | `404 Not Found` | پست با این شناسه یافت نشد یا در وضعیت منتشر شده نیست |
