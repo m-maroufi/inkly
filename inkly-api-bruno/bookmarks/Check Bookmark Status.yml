@@ -1,0 +1,82 @@
+info:
+  name: Check Bookmark Status
+  type: http
+  seq: 2
+
+http:
+  method: GET
+  url: "{{base_url}}/bookmarks/post/{{postId}}/status"
+  auth:
+    type: bearer
+    token: "{{accessToken}}"
+
+runtime:
+  variables:
+    - name: postId
+      value: b7741389-61fc-4b86-89be-b82e7e32a28c
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+docs: |-
+  ## بررسی وضعیت نشان بودن پست (Check Bookmark Status)
+
+  این اندپوینت برای بررسی اینکه آیا کاربر لاگین کرده در حال حاضر این پست را در لیست نشان‌شده‌های خود دارد یا خیر استفاده می‌شود (جهت نمایش آیکون ذخیره به صورت پر یا خالی در رابط کاربری).
+
+  ---
+
+  ### 📌 قوانین بیزینس لاجیک
+  - **وضعیت پست:** پست هدف باید حتماً در وضعیت `PUBLISHED` باشد؛ در غیر این صورت خطای `404 Not Found` بازگردانده می‌شود.
+  - **نتیجه پاسخ:** 
+    - در صورت نشان بودن: `{ "bookmarked": true }`
+    - در صورت نشان نبودن: `{ "bookmarked": false }`
+
+  ---
+
+  ### 🔐 احراز هویت و دسترسی
+  - **نوع توکن:** Bearer Token (`{{accessToken}}`)
+  - **نقش‌های مجاز:** تمام کاربران لاگین کرده (`USER`, `AUTHOR`, `ADMIN`)
+
+  ---
+
+  ### 🌐 مشخصات درخواست
+  - **متد:** `GET`
+  - **آدرس:** `{{base_url}}/bookmarks/post/:postId/status`
+  - **بدنه:** ندارد
+
+  ---
+
+  ### 📤 نمونه پاسخ موفق (`200 OK`)
+
+  #### اگر کاربر قبلاً پست را نشان کرده باشد:
+  ```json
+  {
+    "success": true,
+    "data": {
+      "bookmarked": true
+    }
+  }
+  ```
+
+  #### اگر کاربر پست را نشان نکرده باشد:
+  ```json
+  {
+    "success": true,
+    "data": {
+      "bookmarked": false
+    }
+  }
+  ```
+
+  ---
+
+  ### ❌ خطاهای احتمالی
+  | کد وضعیت | پیام / علت |
+  |----------|------------|
+  | `400 Bad Request` | فرمت پارامتر `postId` در URL نامعتبر است (UUID معتبر نیست) |
+  | `401 Unauthorized` | کاربر لاگین نکرده است یا توکن نامعتبر/منقضی است |
+  | `404 Not Found` | پست یافت نشد یا در وضعیت منتشر شده قرار ندارد |
