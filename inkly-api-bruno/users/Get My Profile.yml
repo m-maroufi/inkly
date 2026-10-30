@@ -1,0 +1,73 @@
+info:
+  name: Get My Profile
+  type: http
+  seq: 1
+
+http:
+  method: GET
+  url: "{{base_url}}/users/me"
+  auth:
+    type: bearer
+    token: "{{accessToken}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+docs: |-
+  ## دریافت مشخصات پروفایل من (Get My Profile)
+
+  این اندپوینت برای دریافت اطلاعات کامل کاربری و آمار اختصاصی حساب کاربری لاگین کرده استفاده می‌شود.
+
+  ---
+
+  ### 📌 قوانین بیزینس لاجیک
+  - **محافظت‌شده:** کاربر باید حتماً لاگین کرده باشد و توکن معتبر ارسال کند.
+  - **محاسبه لحظه‌ای آمار:** تعداد مقالات منتشر شده (`postsCount`)، تعداد فالوئرها (`followersCount`) و تعداد دنبال‌شدگان (`followingCount`) به صورت زنده از دیتابیس محاسبه شده و در آبجکت `stats` بازگردانده می‌شوند.
+
+  ---
+
+  ### 🔐 احراز هویت و دسترسی
+  - **نوع توکن:** Bearer Token (`{{accessToken}}`)
+  - **نقش‌های مجاز:** تمام کاربران لاگین کرده (`USER`, `AUTHOR`, `ADMIN`)
+
+  ---
+
+  ### 🌐 مشخصات درخواست
+  - **متد:** `GET`
+  - **آدرس:** `{{base_url}}/users/me`
+  - **بدنه:** ندارد
+
+  ---
+
+  ### 📤 نمونه پاسخ موفق (`200 OK`)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "36c5b3f9-da2b-4577-afe2-0ba225b98049",
+      "username": "mehdi",
+      "displayName": "مهدی",
+      "avatarUrl": null,
+      "bio": null,
+      "role": "ADMIN",
+      "createdAt": "2026-10-15T08:00:00.000Z",
+      "stats": {
+        "postsCount": 3,
+        "followersCount": 1,
+        "followingCount": 1
+      }
+    }
+  }
+  ```
+
+  ---
+
+  ### ❌ خطاهای احتمالی
+  | کد وضعیت | پیام / علت |
+  |----------|------------|
+  | `401 Unauthorized` | کاربر لاگین نکرده است یا توکن منقضی است |
+  | `404 Not Found` | کاربر در دیتابیس یافت نشد |

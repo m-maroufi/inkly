@@ -1,0 +1,76 @@
+info:
+  name: Get Public Profile By Username
+  type: http
+  seq: 3
+
+http:
+  method: GET
+  url: "{{base_url}}/users/{{username}}"
+  auth: inherit
+
+runtime:
+  variables:
+    - name: username
+      value: mehdi_dev
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+docs: |-
+  ## دریافت پروفایل عمومی نویسنده (Get Public Profile By Username)
+
+  این اندپوینت عمومی برای دریافت مشخصات پروفایل عمومی یک نویسنده به همراه آمار تعاملات او (تعداد مقالات، فالوئرها و دنبال‌شدگان) با استفاده از نام کاربری (`username`) استفاده می‌شود.
+
+  ---
+
+  ### 📌 قوانین بیزینس لاجیک
+  - **دسترسی عمومی:** هر کاربری (حتی بدون نیاز به احراز هویت) می‌تواند صفحه عمومی نویسندگان را مشاهده کند.
+  - **اطلاعات حساس:** ایمیل و شماره تلفن کاربر در این پاسخ برگردانده نمی‌شوند (حفظ حریم خصوصی).
+  - **آمار لحظه‌ای:** تعداد کل مقالات منتشر شده (`postsCount`)، تعداد دنبال‌کنندگان (`followersCount`) و تعداد افراد دنبال‌شده (`followingCount`) به صورت زنده محاسبه می‌شوند.
+
+  ---
+
+  ### 🔐 احراز هویت و دسترسی
+  - **نوع دسترسی:** عمومی (Public - بدون نیاز به توکن احراز هویت)
+
+  ---
+
+  ### 🌐 مشخصات درخواست
+  - **متد:** `GET`
+  - **آدرس:** `{{base_url}}/users/:username`
+  - **بدنه:** ندارد
+
+  ---
+
+  ### 📤 نمونه پاسخ موفق (`200 OK`)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "36c5b3f9-da2b-4577-afe2-0ba225b98049",
+      "username": "mehdi_backend",
+      "displayName": "مهدی معروفی",
+      "avatarUrl": "https://res.cloudinary.com/demo/image/upload/sample.jpg",
+      "bio": "توسعه‌دهنده بک‌اند Node.js و علاقه‌مند به معماری سیستم‌های توزیع‌شده",
+      "role": "ADMIN",
+      "createdAt": "2026-10-15T08:00:00.000Z",
+      "stats": {
+        "postsCount": 3,
+        "followersCount": 1,
+        "followingCount": 1
+      }
+    }
+  }
+  ```
+
+  ---
+
+  ### ❌ خطاهای احتمالی
+  | کد وضعیت | پیام / علت |
+  |----------|------------|
+  | `400 Bad Request` | نام کاربری خالی یا نامعتبر است |
+  | `404 Not Found` | نویسنده‌ای با این نام کاربری یافت نشد |
