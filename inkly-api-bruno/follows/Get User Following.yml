@@ -1,0 +1,74 @@
+info:
+  name: Get User Following
+  type: http
+  seq: 4
+
+http:
+  method: GET
+  url: "{{base_url}}/follows/{{userId}}/following"
+
+runtime:
+  variables:
+    - name: userId
+      value: 36c5b3f9-da2b-4577-afe2-0ba225b98049
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+docs: |-
+  ## دریافت لیست دنبال‌شدگان کاربر (Get User Following)
+
+  این اندپوینت عمومی برای دریافت تعداد کل و مشخصات نویسندگانی که یک کاربر آن‌ها را دنبال (فالو) می‌کند استفاده می‌شود.
+
+  ---
+
+  ### 📌 قوانین بیزینس لاجیک
+  - **بررسی وجود کاربر:** کاربر هدف باید حتماً در سیستم وجود داشته باشد (در غیر این صورت خطای `404 Not Found`).
+  - **اطلاعات کاربران:** برای هر دنبال‌شونده فیلدهای عمومی (`id`, `username`, `displayName`, `avatarUrl`, `bio`) به همراه تاریخ شروع دنبال کردن (`followedAt`) بازگردانده می‌شود.
+  - **ترتیب نمایش:** کاربران بر اساس زمان شروع دنبال کردن به صورت نزولی (جدیدترین دنبال‌شدگان در ابتدا) مرتب هستند.
+
+  ---
+
+  ### 🔐 احراز هویت و دسترسی
+  - **نوع دسترسی:** عمومی (Public - بدون نیاز به توکن احراز هویت)
+
+  ---
+
+  ### 🌐 مشخصات درخواست
+  - **متد:** `GET`
+  - **آدرس:** `{{base_url}}/follows/:userId/following`
+  - **بدنه:** ندارد
+
+  ---
+
+  ### 📤 نمونه پاسخ موفق (`200 OK`)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "followingCount": 1,
+      "following": [
+        {
+          "id": "u2222222-2222-2222-2222-222222222222",
+          "username": "sara_dev",
+          "displayName": "سارا محمدی",
+          "avatarUrl": "https://res.cloudinary.com/demo/image/upload/sample.jpg",
+          "bio": "علاقه‌مند به هوش مصنوعی و معماری سیستم",
+          "followedAt": "2026-10-30T09:56:00.000Z"
+        }
+      ]
+    }
+  }
+  ```
+
+  ---
+
+  ### ❌ خطاهای احتمالی
+  | کد وضعیت | پیام / علت |
+  |----------|------------|
+  | `400 Bad Request` | فرمت `userId` در URL نامعتبر است (UUID نیست) |
+  | `404 Not Found` | کاربر با این شناسه یافت نشد |

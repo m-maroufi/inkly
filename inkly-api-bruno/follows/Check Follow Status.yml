@@ -1,0 +1,82 @@
+info:
+  name: Check Follow Status
+  type: http
+  seq: 2
+
+http:
+  method: GET
+  url: "{{base_url}}/follows/{{userId}}/status"
+  auth:
+    type: bearer
+    token: "{{accessToken}}"
+
+runtime:
+  variables:
+    - name: userId
+      value: 36c5b3f9-da2b-4577-afe2-0ba225b98049
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+docs: |-
+  ## بررسی وضعیت دنبال کردن کاربر (Check Follow Status)
+
+  این اندپوینت برای بررسی اینکه آیا کاربر لاگین کرده در حال حاضر نویسنده هدف را دنبال (فالو) می‌کند یا خیر استفاده می‌شود (جهت نمایش وضعیت دکمه فالو به صورت Follow یا Following در رابط کاربری).
+
+  ---
+
+  ### 📌 قوانین بیزینس لاجیک
+  - **بررسی وجود کاربر:** کاربر هدف باید حتماً در سیستم وجود داشته باشد (در غیر این صورت خطای `404 Not Found`).
+  - **نتیجه پاسخ:** 
+    - در صورت فالو بودن: `{ "following": true }`
+    - در صورت فالو نبودن: `{ "following": false }`
+
+  ---
+
+  ### 🔐 احراز هویت و دسترسی
+  - **نوع توکن:** Bearer Token (`{{accessToken}}`)
+  - **نقش‌های مجاز:** تمام کاربران لاگین کرده (`USER`, `AUTHOR`, `ADMIN`)
+
+  ---
+
+  ### 🌐 مشخصات درخواست
+  - **متد:** `GET`
+  - **آدرس:** `{{base_url}}/follows/:userId/status`
+  - **بدنه:** ندارد
+
+  ---
+
+  ### 📤 نمونه پاسخ موفق (`200 OK`)
+
+  #### اگر کاربر فالو باشد:
+  ```json
+  {
+    "success": true,
+    "data": {
+      "following": true
+    }
+  }
+  ```
+
+  #### اگر کاربر فالو نباشد:
+  ```json
+  {
+    "success": true,
+    "data": {
+      "following": false
+    }
+  }
+  ```
+
+  ---
+
+  ### ❌ خطاهای احتمالی
+  | کد وضعیت | پیام / علت |
+  |----------|------------|
+  | `400 Bad Request` | فرمت پارامتر `userId` در URL نامعتبر است (UUID نیست) |
+  | `401 Unauthorized` | کاربر لاگین نکرده است یا توکن نامعتبر/منقضی است |
+  | `404 Not Found` | کاربر مقصد یافت نشد |

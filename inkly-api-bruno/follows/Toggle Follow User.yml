@@ -1,0 +1,84 @@
+info:
+  name: Toggle Follow User
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{base_url}}/follows/{{userId}}"
+  auth:
+    type: bearer
+    token: "{{accessToken}}"
+
+runtime:
+  variables:
+    - name: userId
+      value: 36c5b3f9-da2b-4577-afe2-0ba225b98049
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+docs: |-
+  ## دنبال کردن یا لغو دنبال کردن کاربر (Toggle Follow)
+
+  این اندپوینت برای فالو کردن یا آن‌فالو کردن یک نویسنده توسط کاربر لاگین کرده استفاده می‌شود.
+
+  ---
+
+  ### 📌 قوانین بیزینس لاجیک
+  - **عملکرد دوطرفه (Toggle):**
+    - اگر قبلاً کاربر را فالو **نکرده باشد**: رکورد فالو ایجاد شده و `{ "following": true }` بازگردانده می‌شود.
+    - اگر قبلاً کاربر را فالو **کرده باشد**: رکورد فالو حذف شده و `{ "following": false }` بازگردانده می‌شود.
+  - **عدم امکان فالو کردن خود:** یک کاربر نمی‌تواند خودش را فالو کند؛ در این صورت خطای `409 Conflict` بازگردانده می‌شود.
+  - **بررسی وجود کاربر:** کاربر مقصد باید حتماً در سیستم وجود داشته باشد (در غیر این صورت خطای `404 Not Found`).
+
+  ---
+
+  ### 🔐 احراز هویت و دسترسی
+  - **نوع توکن:** Bearer Token (`{{accessToken}}`)
+  - **نقش‌های مجاز:** تمام کاربران لاگین کرده (`USER`, `AUTHOR`, `ADMIN`)
+
+  ---
+
+  ### 🌐 مشخصات درخواست
+  - **متد:** `POST`
+  - **آدرس:** `{{base_url}}/follows/:userId`
+  - **بدنه:** ندارد
+
+  ---
+
+  ### 📤 نمونه پاسخ موفق (`200 OK`)
+
+  #### در صورت فالو کردن:
+  ```json
+  {
+    "success": true,
+    "data": {
+      "following": true
+    }
+  }
+  ```
+
+  #### در صورت آن‌فالو کردن:
+  ```json
+  {
+    "success": true,
+    "data": {
+      "following": false
+    }
+  }
+  ```
+
+  ---
+
+  ### ❌ خطاهای احتمالی
+  | کد وضعیت | پیام / علت |
+  |----------|------------|
+  | `400 Bad Request` | فرمت `userId` در URL معتبر نیست (UUID نیست) |
+  | `401 Unauthorized` | کاربر لاگین نکرده است یا توکن منقضی است |
+  | `404 Not Found` | کاربر مقصد یافت نشد |
+  | `409 Conflict` | کاربر قصد فالو کردن خودش را دارد |
