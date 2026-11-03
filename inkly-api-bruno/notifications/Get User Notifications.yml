@@ -1,0 +1,90 @@
+info:
+  name: Get User Notifications
+  type: http
+  seq: 1
+
+http:
+  method: GET
+  url: "{{base_url}}/notifications"
+  auth:
+    type: bearer
+    token: "{{accessToken}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+docs: |-
+  ## دریافت صندوق اعلان‌های کاربر (Get User Notifications)
+
+  این اندپوینت برای دریافت لیست تمامی اعلان‌های کاربر لاگین کرده به همراه تعداد کل اعلان‌های خوانده‌نشده (`unreadCount`) استفاده می‌شود.
+
+  ---
+
+  ### 📌 قوانین بیزینس لاجیک
+  - **دسترسی اختصاصی:** هر کاربر فقط اعلان‌هایی را می‌بیند که برای خود او ارسال شده باشد (`recipient_id = current_user`).
+  - **اطلاعات غنی (Rich Notification Data):** برای هر اعلان، اطلاعات فرد ایجادکننده رویداد (`actor`)، اطلاعات مقاله مربوطه (`post`) و متن کامنت مربوطه (`comment`) در صورت وجود بازگردانده می‌شوند.
+  - **انواع اعلان‌ها (`type`):**
+    - `POST_LIKED`: لایک شدن پست
+    - `COMMENT_RECEIVED`: دریافت کامنت جدید روی پست
+    - `COMMENT_REPLY`: پاسخ به کامنت کاربر
+    - `NEW_FOLLOWER`: دنبال شدن توسط کاربری جدید
+    - `POST_SUBMITTED_FOR_REVIEW`: ارسال پست برای بازبینی (ویژه مدیران)
+    - `POST_APPROVED`: تایید انتشار پست توسط ادمین
+    - `POST_REJECTED`: رد شدن پست توسط ادمین
+  - **ترتیب نمایش:** اعلان‌ها بر اساس تاریخ ایجاد (`createdAt`) به صورت نزولی (جدیدترین اعلان‌ها در بالا) مرتب شده‌اند.
+
+  ---
+
+  ### 🔐 احراز هویت و دسترسی
+  - **نوع توکن:** Bearer Token (`{{accessToken}}`)
+  - **نقش‌های مجاز:** تمام کاربران لاگین کرده (`USER`, `AUTHOR`, `ADMIN`)
+
+  ---
+
+  ### 🌐 مشخصات درخواست
+  - **متد:** `GET`
+  - **آدرس:** `{{base_url}}/notifications`
+  - **بدنه:** ندارد
+
+  ---
+
+  ### 📤 نمونه پاسخ موفق (`200 OK`)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "unreadCount": 1,
+      "notifications": [
+        {
+          "id": "n1111111-1111-1111-1111-111111111111",
+          "type": "POST_LIKED",
+          "readAt": null,
+          "createdAt": "2026-11-03T16:00:00.000Z",
+          "actor": {
+            "id": "u2222222-2222-2222-2222-222222222222",
+            "username": "ali",
+            "displayName": "علی رضایی",
+            "avatarUrl": null
+          },
+          "post": {
+            "id": "p1111111-1111-1111-1111-111111111111",
+            "title": "معماری تمیز در نود جی‌اس",
+            "slug": "clean-architecture-in-nodejs"
+          },
+          "comment": null
+        }
+      ]
+    }
+  }
+  ```
+
+  ---
+
+  ### ❌ خطاهای احتمالی
+  | کد وضعیت | پیام / علت |
+  |----------|------------|
+  | `401 Unauthorized` | کاربر لاگین نکرده است یا توکن منقضی است |

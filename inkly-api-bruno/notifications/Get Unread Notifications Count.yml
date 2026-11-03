@@ -1,0 +1,61 @@
+info:
+  name: Get Unread Notifications Count
+  type: http
+  seq: 2
+
+http:
+  method: GET
+  url: "{{base_url}}/notifications/unread-count"
+  auth:
+    type: bearer
+    token: "{{accessToken}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+docs: |-
+  ## دریافت تعداد اعلان‌های خوانده‌نشده (Get Unread Notifications Count)
+
+  این اندپوینت سبک برای دریافت تعداد اعلان‌های خوانده‌نشده‌ی کاربر لاگین کرده استفاده می‌شود (جهت نمایش نشان اعلان روی آیکون زنگوله در هدر سایت).
+
+  ---
+
+  ### 📌 قوانین بیزینس لاجیک
+  - **محاسبه اعلان‌های خوانده‌نشده:** تنها اعلان‌هایی شمارش می‌شوند که مقدار فیلد `read_at` در آن‌ها برابر با `null` باشد و گیرنده آن خودِ کاربر فعلی باشد.
+  - **کاربرد فرانت‌اند:** برای Polling دوره‌ای در نوبار یا هدر سایت بدون نیاز به دانلود لیست حجیم تمام اعلان‌ها.
+
+  ---
+
+  ### 🔐 احراز هویت و دسترسی
+  - **نوع توکن:** Bearer Token (`{{accessToken}}`)
+  - **نقش‌های مجاز:** تمام کاربران لاگین کرده (`USER`, `AUTHOR`, `ADMIN`)
+
+  ---
+
+  ### 🌐 مشخصات درخواست
+  - **متد:** `GET`
+  - **آدرس:** `{{base_url}}/notifications/unread-count`
+  - **بدنه:** ندارد
+
+  ---
+
+  ### 📤 نمونه پاسخ موفق (`200 OK`)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "unreadCount": 3
+    }
+  }
+  ```
+
+  ---
+
+  ### ❌ خطاهای احتمالی
+  | کد وضعیت | پیام / علت |
+  |----------|------------|
+  | `401 Unauthorized` | کاربر لاگین نکرده است یا توکن منقضی است |

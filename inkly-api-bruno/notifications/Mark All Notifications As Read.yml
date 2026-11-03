@@ -1,0 +1,62 @@
+info:
+  name: Mark All Notifications As Read
+  type: http
+  seq: 3
+
+http:
+  method: PATCH
+  url: "{{base_url}}/notifications/read-all"
+  auth:
+    type: bearer
+    token: "{{accessToken}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+docs: |-
+  ## علامت‌گذاری تمام اعلان‌ها به عنوان خوانده‌شده (Mark All Notifications As Read)
+
+  این اندپوینت برای خوانده‌شده کردن تمام اعلان‌های خوانده‌نشده‌ی کاربر با یک درخواست استفاده می‌شود (دکمه "خواندن همه").
+
+  ---
+
+  ### 📌 قوانین بیزینس لاجیک
+  - **به‌روزرسانی دسته‌جمعی:** در یک کوئری سریع، تمام رکوردهای اعلانی که متعلق به کاربر لاگین کرده بوده و مقدار `read_at` در آن‌ها برابر با `null` بوده، مقدار `read_at` آن‌ها برابر با زمان جاری سرور (`now()`) تنظیم می‌شود.
+  - **تعداد تغییرات:** تعداد اعلان‌هایی که وضعیت آن‌ها تغییر کرده در فیلد `count` بازگردانده می‌شود.
+
+  ---
+
+  ### 🔐 احراز هویت و دسترسی
+  - **نوع توکن:** Bearer Token (`{{accessToken}}`)
+  - **نقش‌های مجاز:** تمام کاربران لاگین کرده (`USER`, `AUTHOR`, `ADMIN`)
+
+  ---
+
+  ### 🌐 مشخصات درخواست
+  - **متد:** `PATCH`
+  - **آدرس:** `{{base_url}}/notifications/read-all`
+  - **بدنه:** ندارد
+
+  ---
+
+  ### 📤 نمونه پاسخ موفق (`200 OK`)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "count": 5,
+      "message": "All notifications marked as read."
+    }
+  }
+  ```
+
+  ---
+
+  ### ❌ خطاهای احتمالی
+  | کد وضعیت | پیام / علت |
+  |----------|------------|
+  | `401 Unauthorized` | کاربر لاگین نکرده است یا توکن منقضی است |
