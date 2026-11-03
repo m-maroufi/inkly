@@ -38,7 +38,6 @@ export async function authMiddleware(
       throw new AuthenticationError("Access token is no longer valid.");
     }
 
-    
     req.user = {
       id: payload.sub,
       role: payload.role,
@@ -47,5 +46,38 @@ export async function authMiddleware(
     next();
   } catch (error) {
     next(error);
+  }
+}
+
+export async function optionalAuthMiddleware(
+  req: Request,
+  _res: Response,
+  next: NextFunction,
+) {
+  try {
+    const authorization = req.headers.authorization;
+    if (!authorization) return next();
+
+    const [scheme, token, ...extraParts] = authorization.split(" ");
+    if (scheme !== "Bearer" || !token || extraParts.length > 0) return next();
+
+    const payload = await verifyAccessToken(token);
+    const isRevoked = await isAccessTokenRevoked(token);
+    if (isRevoked) return next();
+
+    const isVersionCurrent = await isAccessTokenVersionCurrent(
+      payload.sub,
+      payload.ver,
+    );
+    if (!isVersionCurrent) return next();
+
+    req.user = {
+      id: payload.sub,
+      role: payload.role,
+    };
+
+    next();
+  } catch {
+    next();
   }
 }

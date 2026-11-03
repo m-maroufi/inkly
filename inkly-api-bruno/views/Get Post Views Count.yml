@@ -1,0 +1,64 @@
+info:
+  name: Get Post Views Count
+  type: http
+  seq: 2
+
+http:
+  method: GET
+  url: "{{base_url}}/views/post/{{postId}}"
+  auth: inherit
+
+runtime:
+  variables:
+    - name: postId
+      value: b7741389-61fc-4b86-89be-b82e7e32a28c
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+docs: |-
+  ## دریافت تعداد کل بازدیدهای مقاله (Get Post Views Count)
+
+  این اندپوینت عمومی برای دریافت تعداد کل دفعات مشاهده شدن یک مقاله منتشر شده استفاده می‌شود.
+
+  ---
+
+  ### 📌 قوانین بیزینس لاجیک
+  - **وضعیت مقاله:** مقاله باید حتماً در وضعیت `PUBLISHED` باشد (در غیر این صورت خطای `404 Not Found`).
+  - **دقت آمار:** تعداد کل سطرهای ثبت‌شده در جدول `post_views` برای این مقاله به عنوان مقدار `totalViews` بازگردانده می‌شود.
+
+  ---
+
+  ### 🔐 احراز هویت و دسترسی
+  - **نوع دسترسی:** عمومی (Public - بدون نیاز به توکن احراز هویت)
+
+  ---
+
+  ### 🌐 مشخصات درخواست
+  - **متد:** `GET`
+  - **آدرس:** `{{base_url}}/views/post/:postId`
+  - **بدنه:** ندارد
+
+  ---
+
+  ### 📤 نمونه پاسخ موفق (`200 OK`)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "totalViews": 1
+    }
+  }
+  ```
+
+  ---
+
+  ### ❌ خطاهای احتمالی
+  | کد وضعیت | پیام / علت |
+  |----------|------------|
+  | `400 Bad Request` | فرمت `postId` در URL معتبر نیست (UUID نیست) |
+  | `404 Not Found` | مقاله با این شناسه یافت نشد یا در وضعیت منتشر شده نیست |

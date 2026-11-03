@@ -10,6 +10,7 @@ import { bookmarkRouter } from "../modules/bookmarks/bookmark.routes";
 import { followRouter } from "../modules/follows/follow.routes";
 import { userRouter } from "../modules/users/user.routes";
 import { notificationRouter } from "../modules/notifications/notification.routes";
+import { viewRouter } from "../modules/views/view.routes";
 
 export const apiV1Router = Router();
 
@@ -34,3 +35,5 @@ apiV1Router.use("/follows", followRouter);
 apiV1Router.use("/users", userRouter);
 
 apiV1Router.use("/notifications", notificationRouter);
+
+apiV1Router.use("/views", viewRouter);
