@@ -1,0 +1,72 @@
+info:
+  name: Delete Media
+  type: http
+  seq: 5
+
+http:
+  method: DELETE
+  url: "{{base_url}}/media/{{mediaId}}"
+  auth:
+    type: bearer
+    token: "{{accessToken}}"
+
+runtime:
+  variables:
+    - name: mediaId
+      value: 9f8416e5-56b1-4e81-b6df-b33c67515f6e
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+docs: |-
+  ## حذف رسانه (Delete Media)
+
+  این اندپوینت برای حذف دائمی یک فایل رسانه‌ای از سرورهای ابری Cloudinary و همچنین حذف رکورد متادیتای آن از پایگاه داده استفاده می‌شود.
+
+  ---
+
+  ### 📌 قوانین بیزینس لاجیک
+  - **احراز هویت و مالکیت:** فقط کاربر آپلودکننده فایل (`uploaded_by = current_user`) یا کاربران با نقش `ADMIN` اجازه حذف دارند (سایر کاربران با خطای `403 Forbidden` مواجه می‌شوند).
+  - **بررسی وجود فایل:** در صورتی که فایل قبلاً حذف شده باشد یا شناسه‌ای اشتباه ارسال شود، خطای `404 Not Found` برگردانده می‌شود.
+  - **حذف دو مرحله‌ای امن (Dual Delete):**
+    1. ابتدا فایل فیزیکی از طریق کلید ذخیره‌سازی (`storage_key`) از سرور **Cloudinary** پاک می‌شود.
+    2. سپس سطر متناظر با آن از جدول `media` در دیتابیس حذف می‌گردد تا هیچ فایل یتیم (Orphan) یا اطلاعات ناسازگاری باقی نماند.
+
+  ---
+
+  ### 🔐 احراز هویت و دسترسی
+  - **نوع دسترسی:** نیاز به لاگین (Bearer Token: `{{accessToken}}`)
+  - **نقش‌های مجاز:** مالک فایل یا `ADMIN`
+
+  ---
+
+  ### 🌐 مشخصات درخواست
+  - **متد:** `DELETE`
+  - **آدرس:** `{{base_url}}/media/:mediaId`
+  - **پارامتر مسیر (`Params`):** `mediaId` = شناسه UUID فایل رسانه
+  - **بدنه:** ندارد
+
+  ---
+
+  ### 📤 نمونه پاسخ موفق (`200 OK`)
+  ```json
+  {
+    "success": true,
+    "message": "Media deleted successfully."
+  }
+  ```
+
+  ---
+
+  ### ❌ خطاهای احتمالی
+  | کد وضعیت | پیام / علت |
+  |----------|------------|
+  | `400 Bad Request` | فرمت `mediaId` در آدرس URL نامعتبر است (فرمت UUID نیست) |
+  | `401 Unauthorized` | کاربر لاگین نکرده است یا توکن ارسال نشده است |
+  | `403 Forbidden` | کاربر مالک این فایل نیست و نقش ادمین نیز ندارد |
+  | `404 Not Found` | فایلی با این شناسه در سامانه یافت نشد |
+  | `500 Internal Server` | خطای برقراری ارتباط با Cloudinary هنگام حذف فایل |

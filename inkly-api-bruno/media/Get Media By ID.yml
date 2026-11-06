@@ -1,0 +1,79 @@
+info:
+  name: Get Media By ID
+  type: http
+  seq: 3
+
+http:
+  method: GET
+  url: "{{base_url}}/media/{{mediaId}}"
+  auth:
+    type: bearer
+    token: "{{accessToken}}"
+
+runtime:
+  variables:
+    - name: mediaId
+      value: 9f8416e5-56b1-4e81-b6df-b33c67515f6e
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+docs: |-
+  ## دریافت مشخصات یک رسانه (Get Media By ID)
+
+  این اندپوینت برای استعلام و مشاهده مشخصات کامل یک رسانه بر اساس شناسه منحصربه‌فرد آن (`mediaId`) استفاده می‌شود.
+
+  ---
+
+  ### 📌 قوانین بیزینس لاجیک
+  - **دسترسی عمومی (Public):** برای مشاهده مشخصات یک رسانه نیازی به لاگین نیست تا فرانت‌اند یا سرویس‌های دیگر بتوانند متادیتای تصویر را بخوانند.
+  - **بررسی وجود رسانه:** در صورتی که شناسه‌ای نامعتبر یا حذف‌شده ارسال شود، خطای `404 Not Found` صادر می‌گردد.
+
+  ---
+
+  ### 🔐 احراز هویت و دسترسی
+  - **نوع دسترسی:** عمومی (بدون نیاز به لاگین)
+
+  ---
+
+  ### 🌐 مشخصات درخواست
+  - **متد:** `GET`
+  - **آدرس:** `{{base_url}}/media/:mediaId`
+  - **پارامتر مسیر (`Params`):** `mediaId` = شناسه UUID فایل رسانه
+  - **بدنه:** ندارد
+
+  ---
+
+  ### 📤 نمونه پاسخ موفق (`200 OK`)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "e8d6fcb2-6019-482f-870a-019fefba7412",
+      "uploaded_by": "u1111111-1111-1111-1111-111111111111",
+      "original_name": "cover-image.png",
+      "storage_key": "inkly/media/abc123xyz",
+      "url": "http://res.cloudinary.com/demo/image/upload/v1234567890/inkly/media/abc123xyz.png",
+      "media_type": "IMAGE",
+      "mime_type": "image/png",
+      "size": 245890,
+      "width": null,
+      "height": null,
+      "alt_text": "تصویر کاور مقاله آموزش نود جی‌اس",
+      "created_at": "2026-11-06T10:50:00.000Z",
+      "updated_at": "2026-11-06T10:50:00.000Z"
+    }
+  }
+  ```
+
+  ---
+
+  ### ❌ خطاهای احتمالی
+  | کد وضعیت | پیام / علت |
+  |----------|------------|
+  | `400 Bad Request` | فرمت `mediaId` نامعتبر است (فرمت UUID نیست) |
+  | `404 Not Found` | فایلی با این شناسه در سامانه یافت نشد |

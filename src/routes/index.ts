@@ -12,6 +12,7 @@ import { userRouter } from "../modules/users/user.routes";
 import { notificationRouter } from "../modules/notifications/notification.routes";
 import { viewRouter } from "../modules/views/view.routes";
 import { reportRouter } from "../modules/reports/report.routes";
+import { mediaRouter } from "../modules/media/media.routes";
 
 export const apiV1Router = Router();
 
@@ -40,3 +41,5 @@ apiV1Router.use("/notifications", notificationRouter);
 apiV1Router.use("/views", viewRouter);
 
 apiV1Router.use("/reports", reportRouter);
+
+apiV1Router.use("/media", mediaRouter);
